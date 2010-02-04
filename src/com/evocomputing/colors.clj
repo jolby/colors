@@ -1,7 +1,7 @@
 (ns
     #^{:doc
        "Color manipulation routines. This is mostly a port of the
-color.rb module in the ruby SASS project:
+color.rb module in the ruby SASS project to Clojure:
 http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
 
 Further references:
@@ -14,7 +14,13 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core math)))
+  (:use (clojure.contrib core math))
+  (:use (clojure.contrib [seq-utils :only [flatten]])))
+
+(declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
+         html4-colors-rgbnum-to-name html4-colors-rgb-to-name
+         rgb-int-to-components rgba-int-to-components rgba-int-from-components
+         rgb-to-hsl hsl-to-rgb)
 
 (defstruct
     #^{:doc
@@ -31,25 +37,32 @@ http://www.w3.org/TR/css3-color/#hsl-color
   ;;be between 0.0 and 360.0
   :hsl)
 
-(def allowable-rgba-keys
-     #{:r :red :g :green :b :blue :a :alpha})
+(def allowable-rgb-keys
+     #{:r :red :g :green :b :blue})
 
 (def allowable-hsl-keys
-     #{:h :hue :s :saturation :l :lightness :a :alpha})
+     #{:h :hue :s :saturation :l :lightness})
 
 (defn create-color-dispatch
   ""
-  [args]
+  ([args]
   (cond
    (or (symbol? args) (string? args) (keyword? args)) ::symbolic-color
    (integer? args) ::rgb-int
-   (and (map? args) (some allowable-rgba-keys (keys args))) ::rgb-map
+   (and (map? args) (some allowable-rgb-keys (keys args))) ::rgb-map
    (and (map? args) (some allowable-hsl-keys (keys args))) ::hsl-map
-   (and (or (seq? args) (seqable? args)) (= (count args) 3)) ::rgb
-   (and (or (seq? args) (seqable? args)) (= (count args) 4)) ::rgba
+   (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
    (= (class args) Color) Color
    true (throw (IllegalArgumentException.
-               (format "Don't know how to process args: %s" args)))))
+                (format "Don't know how to process args: %s" args)))))
+  ([arg & others]
+     (let [args (conj others arg)]
+       (cond
+        (and (keyword? arg) (allowable-rgb-keys arg)) ::rgb-map
+        (and (keyword? arg) (allowable-hsl-keys arg)) ::hsl-map
+        (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
+        true (throw (IllegalArgumentException.
+                     (format "Don't know how to process args: %s" arg)))))))
 
 (defmacro create-color-with-meta
   "Create color with type meta"
@@ -62,58 +75,72 @@ http://www.w3.org/TR/css3-color/#hsl-color
   "Create a color object using the passed in args"
   create-color-dispatch)
 
-(defn stringify
-  "Convert symbol or keyword to lowercase string name, otherwise return untouched."
-  [colorsym]
-  (if (or (symbol? colorsym) (keyword? colorsym))
-    (.toLowerCase (name colorsym))
-    colorsym))
-
 (defmethod create-color ::symbolic-color [colorsym]
-  (let [colorsym (stringify colorsym)]
-    (if-let [rgb-int (html4-colors-name-to-rgbnum colorsym)]
-      (create-color (rgb-int-to-components rgb-int))
-      (create-color
-       (rgba-int-to-components (Integer/decode colorsym))))))
+  (letfn [(stringify [colorsym]
+             (if (or (symbol? colorsym) (keyword? colorsym))
+               (.toLowerCase (name colorsym))
+               colorsym))]
+    (let [colorsym (stringify colorsym)]
+      (if-let [rgb-int (html4-colors-name-to-rgbnum colorsym)]
+        (create-color (rgb-int-to-components rgb-int))
+        (create-color
+         (rgba-int-to-components (Integer/decode colorsym)))))))
 
 (defmethod create-color ::rgb-int [rgb-int]
   (create-color (rgba-int-to-components rgb-int)))
 
-(defmethod create-color ::rgb [rgb]
-  (create-color (conj rgb 255)))
+(defmethod create-color ::rgb-array [rgb-array & others]
+  (let [rgb-array (if others (vec (conj others rgb-array)) rgb-array)
+        ;;if alpha wasn't provided, use default of 255
+        rgba (if (or (= 3 (count rgb-array)) (nil? (rgb-array 3)))
+               (conj rgb-array 255)
+               rgb-array)]
+    (create-color-with-meta
+      (struct color rgba
+              (rgb-to-hsl (rgba 0) (rgba 1) (rgba 2))))))
 
-(defmethod create-color ::rgba [rgba]
-  (create-color-with-meta
-    (struct color rgba
-            (rgb-to-hsl (rgba 0) (rgba 1) (rgba 2)))))
-
-(defmethod create-color ::rgb-map [rgb-map]
-  (let [ks (keys rgb-map)
-        rgba (into [] (map #(rgb-map %)
+(defmethod create-color ::rgb-map [rgb-map & others]
+  (let [rgb-map (if others (apply assoc {} (vec (conj others rgb-map))) rgb-map)
+        ks (keys rgb-map)
+        rgb (into [] (map #(rgb-map %)
                            (map #(some % ks)
-                                '(#{:r :red} #{:g :green} #{:b :blue} #{:a :alpha}))))]
+                                '(#{:r :red} #{:g :green} #{:b :blue}))))
+        alpha (or (:a rgb-map) (:alpha rgb-map))
+        rgba (if alpha (conj rgb alpha) (conj rgb 255))]
     (create-color rgba)))
 
-(defmethod create-color ::hsl-map [hsl-map])
+(defmethod create-color ::hsl-map [hsl-map & others]
+  (let [hsl-map (if others (apply assoc {} (vec (conj others hsl-map))) hsl-map)
+        ks (keys hsl-map)
+        hsl (into [] (map #(hsl-map %)
+                           (map #(some % ks)
+                                '(#{:h :hue} #{:s :saturation} #{:l :lightness}))))
+        rgb (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))
+        alpha (or (:a hsl-map) (:alpha hsl-map))
+        rgba (if alpha (conj rgb alpha) (conj rgb 255))]
+    (create-color rgba)))
 
-(defmethod create-color Color [color])
+(defmethod create-color Color [color]
+  (create-color [(.getRed color) (.getGreen color)
+                 (.getBlue color) (.getAlpha color)]))
 
-(defn red [color] ((:rgb color) 0))
-(defn green [color] ((:rgb color) 1))
-(defn blue [color] ((:rgb color) 2))
-(defn hue [color] ((:hsl color) 0))
-(defn saturation [color] ((:hsl color) 1))
-(defn lightness [color] ((:hsl color) 2))
-(defn alpha [color] ((:rgb color) 3))
+(defn red "Return the red (int) component of this color" [color] ((:rgb color) 0))
+(defn green "Return the green (int) component of this color" [color] ((:rgb color) 1))
+(defn blue "Return the blue (int) component of this color" [color] ((:rgb color) 2))
+(defn hue "Return the hue (float) component of this color" [color] ((:hsl color) 0))
+(defn saturation "Return the saturation (float) component of this color" [color] ((:hsl color) 1))
+(defn lightness "Return the lightness (float) component of this color" [color] ((:hsl color) 2))
+(defn alpha "Return the alpha (int) component of this color" [color] ((:rgb color) 3))
 
 (defn rgba-int
-  ""
+  "Return a integer (RGBA) representation of this color"
   [color]
   (rgba-int-from-components (red color) (green color) (blue color) (alpha color)))
 
 (defmethod print-method ::color [color writer]
-  (print-method (format "#<color: %#08x R: %d, G: %d, B: %d, A: %s>"
-                        (rgba-int color) (red color) (green color) (blue color) (alpha color))
+  (print-method (format "#<color: %#08x R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
+                        (rgba-int color) (red color) (green color) (blue color)
+                        (hue color) (saturation color) (lightness color) (alpha color))
                 writer))
 
 (defn rgb-int-from-components
@@ -148,10 +175,6 @@ http://www.w3.org/TR/css3-color/#hsl-color
   (conj (rgb-int-to-components rgba-int)
         (bit-shift-right rgba-int 24)))
 
-  (comment (into []
-        (reverse (for [n (range 0 3)]
-                   (bit-and (bit-shift-right rgb-int (bit-shift-left n 3)) 0xff)))))
-
 (def html4-colors-name-to-rgbnum
      {
       "black"    0x000000
@@ -181,7 +204,6 @@ http://www.w3.org/TR/css3-color/#hsl-color
 (def html4-colors-rgb-to-name
      (into {} (map (fn [[k v]] [v k]) html4-colors-name-to-rgb)))
 
-
 (defn hue-to-rgb
   "Convert hue color to rgb components
 Based on algorithm described in:
@@ -202,7 +224,7 @@ http://www.w3.org/TR/css3-color/#hsl-color"
 (defn hsl-to-rgb
   "Given color with HSL values return vector of r, g, b.
 
-Based on algorithm described in:
+Based on algorithms described in:
 http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_HSL_to_RGB
 and:
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
@@ -216,7 +238,7 @@ http://www.w3.org/TR/css3-color/#hsl-color"
                 (- (+ l s) (* l s)))
          m1 (- (* l 2) m2)]
         (into []
-              (map #(math/round (* 0xff %))
+              (map #(round (* 0xff %))
                    [(hue-to-rgb m1 m2 (+ h (/ 1.0 3)))
                     (hue-to-rgb m1 m2 h)
                     (hue-to-rgb m1 m2 (- h (/ 1.0 3)))]))))
@@ -243,6 +265,4 @@ http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL
             (= max min) 0
             (< l 0.5) (/ delta (* 2 l))
             :else (/ delta (- 2 (* 2 l))))]
-        ;;(println (format "r: %s g: %s b: %s min: %s max: %s delta: %s H: %s S: %s L: %s"
-        ;;                 r g b min max delta h s l))
         [(mod h 360) (* 100 s) (* 100 l)]))
