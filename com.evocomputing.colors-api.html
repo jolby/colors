@@ -117,7 +117,7 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
   <pre id="var-usage">Usage: (alpha color)
 </pre>
   <pre id="var-docstr">Return the alpha (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L143" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L210" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -126,7 +126,7 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
   <pre id="var-usage">Usage: (blue color)
 </pre>
   <pre id="var-docstr">Return the blue (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L139" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L206" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -137,15 +137,80 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 is an array of integers mapping to the respective RGB(A)
 values. This structure also supports holding an array of float
 values mapping to the respective HSL values as well</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L35" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L35" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
   <h2 id="com.evocomputing.colors/create-color">create-color</h2>
   <span id="var-type">multimethod</span><br />
   <pre id="var-usage">No usage documentation available</pre>
-  <pre id="var-docstr">Create a color object using the passed in args</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L84" id="var-source">Source</a>
+  <pre id="var-docstr">Create a color struct using the passed in args. This will create a
+  color struct that has RGBA integer values in the range:
+- R (Red): Integer in range 0 - 255
+- G (Green): Integer in range 0 - 255
+- B (Blue): Integer in range 0 - 255
+- A (Alpha): Integer in range 0 - 255, with default as 255 (100% opacity)
+
+  and HSL values with the range:
+
+- H (Hue): Float value in the range of: 0.0 - 360.0
+- S (Saturation): Float value in the range: 0.0 - 100.0
+- L (Lightness or Luminance): Float value in the range 0.0 - 100.0
+
+This multimethod is very liberal in what it will accept to create a
+color. Following is a list of acceptable formats:
+
+Single Arg
+- Symbolic: Either a string or keyword or symbol that
+matches an entry in the symbolic color pallette. Currently, this is
+the html4 colors map, but there are plans to allow the symbolic color
+map to be set to any custom pallette.
+  examples:
+  (create-color "blue")
+  (create-color :blue)
+
+- Hexstring: A hex string representation of an RGB(A) color
+  examples:
+  (create-color "0xFFCCAA")
+  (create-color "#FFCCAA")
+  (create-color "Ox80FFFF00") ;; alpha = 128
+
+- Integer: An integer representation of an RGB(A) color
+  examples:
+  (create-color 0xFFCCAA) ;; integer in hexidecimal format
+  (create-color 16764074) ;; same integer in decimal format
+
+- Sequence or array of RGB(A) integers
+  :examples
+  (create-color [255 0 0])
+  (create-color [255 0 0 128]) ;;alpha = 128
+
+- Map of either RGB (A) kw/values or HSL(A) kw/values
+  Allowable RGB keys: :r :red :g :green :b :blue
+  Allowable HSL keys: :h :hue :s :saturation :l :lightness
+
+  examples:
+  (create-color {:r 255 :g 0 :blue 0})
+  (create-color {:r 255 :g 0 :blue 0 :a 128})
+  (create-color {:h 120.0 :s 100.0 :l 50.0})
+  (create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
+
+Multiple Arg
+- Sequence or array of RGB(A) integers
+  :examples
+  (create-color 255 0 0)
+  (create-color 255 0 0 128) ;;alpha = 128
+
+- Assoc list of either RGB (A) kw/values or HSL(A) kw/values
+  Allowable RGB keys: :r :red :g :green :b :blue
+  Allowable HSL keys: :h :hue :s :saturation :l :lightness
+
+  examples:
+  (create-color :r 255 :g 0 :blue 0)
+  (create-color :r 255 :g 0 :blue 0 :a 128)
+  (create-color :h 120.0 :s 100.0 :l 50.0)
+  (create-color :h 120.0 :s 100.0 :l 50.0 :a 128)</pre>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L84" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -155,7 +220,7 @@ values mapping to the respective HSL values as well</pre>
        (create-color-dispatch arg &amp; others)
 </pre>
   <pre id="var-docstr"></pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L56" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L56" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -164,7 +229,7 @@ values mapping to the respective HSL values as well</pre>
   <pre id="var-usage">Usage: (create-color-with-meta &amp; body)
 </pre>
   <pre id="var-docstr">Create color with type meta</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L77" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L77" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -173,7 +238,7 @@ values mapping to the respective HSL values as well</pre>
   <pre id="var-usage">Usage: (green color)
 </pre>
   <pre id="var-docstr">Return the green (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L138" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L205" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -189,7 +254,7 @@ and:
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 and:
 <a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L234" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L301" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -198,7 +263,7 @@ and:
   <pre id="var-usage">Usage: (hue color)
 </pre>
   <pre id="var-docstr">Return the hue (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L140" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L207" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -211,7 +276,7 @@ Based on algorithm described in:
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 and:
 <a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L217" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L284" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -220,7 +285,7 @@ and:
   <pre id="var-usage">Usage: (lightness color)
 </pre>
   <pre id="var-docstr">Return the lightness (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L142" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L209" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -229,7 +294,7 @@ and:
   <pre id="var-usage">Usage: (red color)
 </pre>
   <pre id="var-docstr">Return the red (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L137" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L204" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -239,7 +304,7 @@ and:
 </pre>
   <pre id="var-docstr">Convert a vector of the 3 rgb integer values into a color given in
 numeric rgb format</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L156" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L223" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -249,7 +314,7 @@ numeric rgb format</pre>
 </pre>
   <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 3
 rgb integer values</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L173" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L240" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -262,7 +327,7 @@ rgb integer values</pre>
 
 Based on algorithm described in:
 <a href="http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview">http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview</a></pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L255" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L322" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -271,7 +336,7 @@ Based on algorithm described in:
   <pre id="var-usage">Usage: (rgba-int color)
 </pre>
   <pre id="var-docstr">Return a integer (RGBA) representation of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L145" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L212" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -281,7 +346,7 @@ Based on algorithm described in:
 </pre>
   <pre id="var-docstr">Convert a vector of the 4 rgba integer values into a color given in
 numeric rgb format </pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L164" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L231" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -291,7 +356,7 @@ numeric rgb format </pre>
 </pre>
   <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 4
 rgba integer values</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L181" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L248" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -300,7 +365,7 @@ rgba integer values</pre>
   <pre id="var-usage">Usage: (saturation color)
 </pre>
   <pre id="var-docstr">Return the saturation (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L141" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L208" id="var-source">Source</a>
 </div>
 
 
