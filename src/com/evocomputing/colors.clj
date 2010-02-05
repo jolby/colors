@@ -82,7 +82,75 @@ http://www.w3.org/TR/css3-color/#hsl-color
       {:type ::color}))
 
 (defmulti create-color
-  "Create a color object using the passed in args"
+  "Create a color struct using the passed in args. This will create a
+  color struct that has RGBA integer values in the range:
+- R (Red): Integer in range 0 - 255
+- G (Green): Integer in range 0 - 255
+- B (Blue): Integer in range 0 - 255
+- A (Alpha): Integer in range 0 - 255, with default as 255 (100% opacity)
+
+  and HSL values with the range:
+
+- H (Hue): Float value in the range of: 0.0 - 360.0
+- S (Saturation): Float value in the range: 0.0 - 100.0
+- L (Lightness or Luminance): Float value in the range 0.0 - 100.0
+
+This multimethod is very liberal in what it will accept to create a
+color. Following is a list of acceptable formats:
+
+Single Arg
+- Symbolic: Either a string or keyword or symbol that
+matches an entry in the symbolic color pallette. Currently, this is
+the html4 colors map, but there are plans to allow the symbolic color
+map to be set to any custom pallette.
+  examples:
+  (create-color "blue")
+  (create-color :blue)
+
+-Hexstring: A hex string representation of an RGB(A) color
+  examples:
+  (create-color "0xFFCCAA")
+  (create-color "#FFCCAA")
+  (create-color "Ox80FFFF00") ;; alpha = 128
+
+- Integer: An integer representation of an RGB(A) color
+  examples:
+  (create-color 0xFFCCAA) ;; integer in hexidecimal format
+  (create-color 16764074) ;; same integer in decimal format
+
+- Sequence or array of RGB(A) integers
+  :examples
+  (create-color [255 0 0])
+  (create-color [255 0 0 128]) ;;alpha = 128
+
+- Map of either RGB (A) kw/values or HSL(A) kw/values
+  Allowable RGB keys: :r :red :g :green :b :blue
+  Allowable HSL keys: :h :hue :s :saturation :l :lightness
+
+  examples:
+  (create-color {:r 255 :g 0 :blue 0})
+  (create-color {:r 255 :g 0 :blue 0 :a 128})
+  (create-color {:h 120.0 :s 100.0 :l 50.0})
+  (create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
+
+Multiple Arg
+
+- Sequence or array of RGB(A) integers
+  :examples
+  (create-color 255 0 0)
+  (create-color 255 0 0 128) ;;alpha = 128
+
+- Assoc list of either RGB (A) kw/values or HSL(A) kw/values
+  Allowable RGB keys: :r :red :g :green :b :blue
+  Allowable HSL keys: :h :hue :s :saturation :l :lightness
+
+  examples:
+  (create-color :r 255 :g 0 :blue 0)
+  (create-color :r 255 :g 0 :blue 0 :a 128)
+  (create-color :h 120.0 :s 100.0 :l 50.0)
+  (create-color :h 120.0 :s 100.0 :l 50.0 :a 128)
+"
+
   create-color-dispatch)
 
 (defmethod create-color ::symbolic-color [colorsym]
