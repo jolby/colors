@@ -14,8 +14,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core math))
-  (:use (clojure.contrib [seq-utils :only [flatten]])))
+  (:use (clojure.contrib core math)))
 
 (declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
          html4-colors-rgbnum-to-name html4-colors-rgb-to-name
