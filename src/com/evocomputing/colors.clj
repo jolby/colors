@@ -107,7 +107,7 @@ map to be set to any custom pallette.
   (create-color \"blue\")
   (create-color :blue)
 
--Hexstring: A hex string representation of an RGB(A) color
+- Hexstring: A hex string representation of an RGB(A) color
   examples:
   (create-color \"0xFFCCAA\")
   (create-color \"#FFCCAA\")
@@ -134,7 +134,6 @@ map to be set to any custom pallette.
   (create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
 
 Multiple Arg
-
 - Sequence or array of RGB(A) integers
   :examples
   (create-color 255 0 0)
