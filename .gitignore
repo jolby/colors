@@ -3,3 +3,5 @@ Manifest.txt
 colors.jar
 lib
 classes
+autodoc/**
+resources/**
