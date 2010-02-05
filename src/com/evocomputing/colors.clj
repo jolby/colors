@@ -104,14 +104,14 @@ matches an entry in the symbolic color pallette. Currently, this is
 the html4 colors map, but there are plans to allow the symbolic color
 map to be set to any custom pallette.
   examples:
-  (create-color "blue")
+  (create-color \"blue\")
   (create-color :blue)
 
 -Hexstring: A hex string representation of an RGB(A) color
   examples:
-  (create-color "0xFFCCAA")
-  (create-color "#FFCCAA")
-  (create-color "Ox80FFFF00") ;; alpha = 128
+  (create-color \"0xFFCCAA\")
+  (create-color \"#FFCCAA\")
+  (create-color \"Ox80FFFF00\") ;; alpha = 128
 
 - Integer: An integer representation of an RGB(A) color
   examples:
