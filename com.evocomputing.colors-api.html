@@ -1,0 +1,322 @@
+<html>
+  <head>
+    <title>com.evocomputing.colors API reference (colors)</title>
+    <link href="static/favicon.png" rel="icon" />
+    <link href="static/favicon.png" rel="shortcut icon" />
+    <link media="all" type="text/css" href="static/clojure.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/wiki.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/internal.css" rel="stylesheet" />
+    <!-- TODO: are we using these (from clojure.org)? If so, add the files -->
+    <script src="file/view/code_highlighter.js" type="text/javascript"></script>
+    <script src="file/view/clojure.js" type="text/javascript"></script>
+    <style>.menuWrapper{height: 36px;}</style>
+    <!--[if lte IE 6]>
+    <link rel="stylesheet" href="http://www.wikispaces.com/_/2009051601/s/internal_ie.css" type="text/css" />
+    <![endif]-->
+  </head>
+<!--
+This document was auto-generated from the source by the clojure autodoc system.
+To report errors or ask questions about the overall documentation structure, formatting,
+etc., contact Tom Faulhaber (google mail name: tomfaulhaber).
+For errors in the documentation of a particular namespace, contact the author of that
+namespace.
+-->
+  <body>
+    <div id="AllContentContainer">
+      <div id="Header">
+	<a id="Logo" href="index.html"><img alt="Clojure" height="100" width="100" src="static/clojure-icon.gif" /></a>
+	<h1><a title="page header title" id="page-header" href="index.html">Colors API documentation</a></h1>
+      </div>
+      <div id="leftcolumn"><div style="text-align: center;"></div>
+<div class="menu">
+  <div class="WikiCustomNav WikiElement wiki">
+    <a class="wiki_link" href="index.html">Overview</a><br />
+    <a class="wiki_link" href="api-index.html">API Index</a><br />
+    <a class="wiki_link" href="#">Namespaces:</a>
+    <ul id="left-sidebar-list">
+      <li><a href="com.evocomputing.colors-api.html" class="wiki_link">com.evocomputing.colors</a></li>
+    </ul>
+  </div>
+</div>
+</div>
+      <div id="rightcolumn">
+	<div id="Content">
+	  <div class="contentBox"><div class="innerContentBox">
+              <div id="content_view" class="wiki wikiPage">
+                <div id="right-sidebar"><div id="toc">
+  <h1 class="nopad">Table of Contents</h1>
+  <div style="margin-left: 1em;" class="toc-section">
+    <a href="#toc0">Overview</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/alpha">alpha</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/blue">blue</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/color">color</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/create-color">create-color</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/create-color-dispatch">create-color-dispatch</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/create-color-with-meta">create-color-with-meta</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/green">green</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/hsl-to-rgb">hsl-to-rgb</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/hue">hue</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/hue-to-rgb">hue-to-rgb</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/lightness">lightness</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/red">red</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgb-int-from-components">rgb-int-from-components</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgb-int-to-components">rgb-int-to-components</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgb-to-hsl">rgb-to-hsl</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgba-int">rgba-int</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgba-int-from-components">rgba-int-from-components</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgba-int-to-components">rgba-int-to-components</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/saturation">saturation</a>
+    </div>
+    <br />
+  </div>
+</div>
+</div>
+                <div id="content-tag"><h1 id="overview">API for <span id="namespace-name">com.evocomputing.colors</span></h1>
+by <span id="author">Joel Boehland</span><br />
+<br />Usage:
+<pre>
+(ns your-namespace
+  (:require <span id="long-name">com.evocomputing.colors</span>))
+</pre><pre>
+</pre><h2>Overview</h2>
+<pre id="namespace-docstr">Color manipulation routines. This is mostly a port of the
+color.rb module in the ruby SASS project to Clojure:
+http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
+
+Further references:
+HSL and HSV: http://en.wikipedia.org/wiki/Luminance-Hue-Saturation
+RGB color space: http://en.wikipedia.org/wiki/RGB_color_space
+http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
+<a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
+<br />
+<h2>Public Variables and Functions</h2>
+<div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/alpha">alpha</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (alpha color)
+</pre>
+  <pre id="var-docstr">Return the alpha (int) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L143" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/blue">blue</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (blue color)
+</pre>
+  <pre id="var-docstr">Return the blue (int) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L139" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/color">color</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">Structure representing a color. Default representation
+is an array of integers mapping to the respective RGB(A)
+values. This structure also supports holding an array of float
+values mapping to the respective HSL values as well</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L35" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/create-color">create-color</h2>
+  <span id="var-type">multimethod</span><br />
+  <pre id="var-usage">No usage documentation available</pre>
+  <pre id="var-docstr">Create a color object using the passed in args</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L84" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/create-color-dispatch">create-color-dispatch</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (create-color-dispatch args)
+       (create-color-dispatch arg &amp; others)
+</pre>
+  <pre id="var-docstr"></pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L56" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/create-color-with-meta">create-color-with-meta</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (create-color-with-meta &amp; body)
+</pre>
+  <pre id="var-docstr">Create color with type meta</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L77" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/green">green</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (green color)
+</pre>
+  <pre id="var-docstr">Return the green (int) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L138" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/hsl-to-rgb">hsl-to-rgb</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (hsl-to-rgb hue saturation lightness)
+</pre>
+  <pre id="var-docstr">Given color with HSL values return vector of r, g, b.
+
+Based on algorithms described in:
+http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_HSL_to_RGB
+and:
+http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
+and:
+<a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L234" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/hue">hue</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (hue color)
+</pre>
+  <pre id="var-docstr">Return the hue (float) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L140" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/hue-to-rgb">hue-to-rgb</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (hue-to-rgb m1 m2 hue)
+</pre>
+  <pre id="var-docstr">Convert hue color to rgb components
+Based on algorithm described in:
+http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
+and:
+<a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L217" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/lightness">lightness</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (lightness color)
+</pre>
+  <pre id="var-docstr">Return the lightness (float) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L142" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/red">red</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (red color)
+</pre>
+  <pre id="var-docstr">Return the red (int) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L137" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgb-int-from-components">rgb-int-from-components</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgb-int-from-components r g b)
+</pre>
+  <pre id="var-docstr">Convert a vector of the 3 rgb integer values into a color given in
+numeric rgb format</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L156" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgb-int-to-components">rgb-int-to-components</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgb-int-to-components rgb-int)
+</pre>
+  <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 3
+rgb integer values</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L173" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgb-to-hsl">rgb-to-hsl</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgb-to-hsl red green blue)
+</pre>
+  <pre id="var-docstr">Given the three RGB values, convert to HSL and return vector of
+  Hue, Saturation, Lightness.
+
+Based on algorithm described in:
+<a href="http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview">http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview</a></pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L255" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgba-int">rgba-int</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgba-int color)
+</pre>
+  <pre id="var-docstr">Return a integer (RGBA) representation of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L145" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgba-int-from-components">rgba-int-from-components</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgba-int-from-components r g b a)
+</pre>
+  <pre id="var-docstr">Convert a vector of the 4 rgba integer values into a color given in
+numeric rgb format </pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L164" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgba-int-to-components">rgba-int-to-components</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgba-int-to-components rgba-int)
+</pre>
+  <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 4
+rgba integer values</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L181" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/saturation">saturation</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (saturation color)
+</pre>
+  <pre id="var-docstr">Return the saturation (float) component of this color</pre>
+  <a href="http://github.com/jolby/colors/blob/755fdb3b5173f864d582d889a70bb84fa19594b2/src/com/evocomputing/colors.clj#L141" id="var-source">Source</a>
+</div>
+
+
+</div>
+              </div>
+            </div>
+          </div>
+	</div>
+	<div id="foot">
+	  <div style="text-align: center;" id="copyright">Eclipse Public License (EPL)</div>
+	</div>
+      </div>
+      <div id="DesignedBy">Logo &amp; site design by <a title="Visit Tom Hickey's website." href="http://www.tomhickey.com">Tom Hickey</a>.<br />
+      Clojure auto-documentation system by Tom Faulhaber.</div>
+    </div>
+    <!-- /AllContentContainer -->
+  </body>
+
+</html>
