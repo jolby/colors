@@ -52,6 +52,14 @@ namespace.
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/blue">blue</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/check-convert-unit-float-to-int">check-convert-unit-float-to-int</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/check-hsl">check-hsl</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/check-rgba">check-rgba</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/circle-float?">circle-float?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/color">color</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/create-color">create-color</a>
@@ -70,11 +78,17 @@ namespace.
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/lightness">lightness</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/maybe-convert-alpha">maybe-convert-alpha</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/percent-float?">percent-float?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/red">red</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/rgb-int-from-components">rgb-int-from-components</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/rgb-int-to-components">rgb-int-to-components</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/rgb-int?">rgb-int?</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/rgb-to-hsl">rgb-to-hsl</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
@@ -85,6 +99,8 @@ namespace.
       <a href="#com.evocomputing.colors/rgba-int-to-components">rgba-int-to-components</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#com.evocomputing.colors/saturation">saturation</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#com.evocomputing.colors/unit-float?">unit-float?</a>
     </div>
     <br />
   </div>
@@ -117,7 +133,7 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
   <pre id="var-usage">Usage: (alpha color)
 </pre>
   <pre id="var-docstr">Return the alpha (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L210" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L280" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -126,7 +142,50 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
   <pre id="var-usage">Usage: (blue color)
 </pre>
   <pre id="var-docstr">Return the blue (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L206" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L276" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/check-convert-unit-float-to-int">check-convert-unit-float-to-int</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (check-convert-unit-float-to-int fval)
+</pre>
+  <pre id="var-docstr">Check that the passed in float is in the range 0.0 - 1.0, then
+convert it to the appropriate integer in the range 0 - 255</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L105" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/check-hsl">check-hsl</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (check-hsl hsl)
+       (check-hsl h s l)
+</pre>
+  <pre id="var-docstr">Check that every element is of the format:
+- 1st, H (Hue): Float value in the range of: 0.0 - 360.0
+- 2nd, S (Saturation): Float value in the range: 0.0 - 100.0
+- 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L134" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/check-rgba">check-rgba</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (check-rgba rgba)
+       (check-rgba r g b a)
+</pre>
+  <pre id="var-docstr">Check that every element in the passed in rgba sequence is an
+integer in the range 0 - 255</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L123" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/circle-float?">circle-float?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (circle-float? fval)
+</pre>
+  <pre id="var-docstr">Return true if passed in float is in the range 0.0 - 360.0. False otherwise</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L100" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -137,22 +196,22 @@ http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 is an array of integers mapping to the respective RGB(A)
 values. This structure also supports holding an array of float
 values mapping to the respective HSL values as well</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L35" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L35" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
   <h2 id="com.evocomputing.colors/create-color">create-color</h2>
   <span id="var-type">multimethod</span><br />
   <pre id="var-usage">No usage documentation available</pre>
-  <pre id="var-docstr">Create a color struct using the passed in args. This will create a
-  color struct that has RGBA integer values in the range:
+  <pre id="var-docstr">Create a color struct using the passed in args.
+
+This will create a color struct that has RGBA integer values in the range:
 - R (Red): Integer in range 0 - 255
 - G (Green): Integer in range 0 - 255
 - B (Blue): Integer in range 0 - 255
 - A (Alpha): Integer in range 0 - 255, with default as 255 (100% opacity)
 
-  and HSL values with the range:
-
+And HSL values with the range:
 - H (Hue): Float value in the range of: 0.0 - 360.0
 - S (Saturation): Float value in the range: 0.0 - 100.0
 - L (Lightness or Luminance): Float value in the range 0.0 - 100.0
@@ -210,7 +269,7 @@ Multiple Arg
   (create-color :r 255 :g 0 :blue 0 :a 128)
   (create-color :h 120.0 :s 100.0 :l 50.0)
   (create-color :h 120.0 :s 100.0 :l 50.0 :a 128)</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L84" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L153" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -220,7 +279,7 @@ Multiple Arg
        (create-color-dispatch arg &amp; others)
 </pre>
   <pre id="var-docstr"></pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L56" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L56" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -229,7 +288,7 @@ Multiple Arg
   <pre id="var-usage">Usage: (create-color-with-meta &amp; body)
 </pre>
   <pre id="var-docstr">Create color with type meta</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L77" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L77" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -238,7 +297,7 @@ Multiple Arg
   <pre id="var-usage">Usage: (green color)
 </pre>
   <pre id="var-docstr">Return the green (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L205" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L275" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -254,7 +313,7 @@ and:
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 and:
 <a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L301" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L371" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -263,7 +322,7 @@ and:
   <pre id="var-usage">Usage: (hue color)
 </pre>
   <pre id="var-docstr">Return the hue (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L207" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L277" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -276,7 +335,7 @@ Based on algorithm described in:
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 and:
 <a href="http://www.w3.org/TR/css3-color/#hsl-color">http://www.w3.org/TR/css3-color/#hsl-color</a></pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L284" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L354" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -285,7 +344,26 @@ and:
   <pre id="var-usage">Usage: (lightness color)
 </pre>
   <pre id="var-docstr">Return the lightness (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L209" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L279" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/maybe-convert-alpha">maybe-convert-alpha</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (maybe-convert-alpha alpha)
+</pre>
+  <pre id="var-docstr">If alpha is a float value, try to convert to integer in range 0 -
+255, otherwise return as-is</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L114" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/percent-float?">percent-float?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (percent-float? fval)
+</pre>
+  <pre id="var-docstr">Return true if passed in float is in the range 0.0 - 100.0. False otherwise</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L95" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -294,7 +372,7 @@ and:
   <pre id="var-usage">Usage: (red color)
 </pre>
   <pre id="var-docstr">Return the red (int) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L204" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L274" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -304,7 +382,7 @@ and:
 </pre>
   <pre id="var-docstr">Convert a vector of the 3 rgb integer values into a color given in
 numeric rgb format</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L223" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L293" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -314,7 +392,17 @@ numeric rgb format</pre>
 </pre>
   <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 3
 rgb integer values</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L240" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L310" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/rgb-int?">rgb-int?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rgb-int? rgb-int)
+</pre>
+  <pre id="var-docstr">If the passed in value is an integer in the range 0 - 255
+inclusive, return true, otherwise return false</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L84" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -327,7 +415,7 @@ rgb integer values</pre>
 
 Based on algorithm described in:
 <a href="http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview">http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview</a></pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L322" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L392" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -336,7 +424,7 @@ Based on algorithm described in:
   <pre id="var-usage">Usage: (rgba-int color)
 </pre>
   <pre id="var-docstr">Return a integer (RGBA) representation of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L212" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L282" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -346,7 +434,7 @@ Based on algorithm described in:
 </pre>
   <pre id="var-docstr">Convert a vector of the 4 rgba integer values into a color given in
 numeric rgb format </pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L231" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L301" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -356,7 +444,7 @@ numeric rgb format </pre>
 </pre>
   <pre id="var-docstr">Convert a color given in numeric rgb format into a vector of the 4
 rgba integer values</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L248" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L318" id="var-source">Source</a>
 </div><div id="var-entry">
   <br />
   <hr />
@@ -365,7 +453,16 @@ rgba integer values</pre>
   <pre id="var-usage">Usage: (saturation color)
 </pre>
   <pre id="var-docstr">Return the saturation (float) component of this color</pre>
-  <a href="http://github.com/jolby/colors/blob/1391538cb0748f371a9d0ed0f1fea3fd301ed6b2/src/com/evocomputing/colors.clj#L208" id="var-source">Source</a>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L278" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="com.evocomputing.colors/unit-float?">unit-float?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (unit-float? fval)
+</pre>
+  <pre id="var-docstr">Return true if passed in float is in the range 0.0 - 1.0. False otherwise</pre>
+  <a href="http://github.com/jolby/colors/blob/2052c2297c23eb154f1a38ad684b03d7b8385a2a/src/com/evocomputing/colors.clj#L90" id="var-source">Source</a>
 </div>
 
 
