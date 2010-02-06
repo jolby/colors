@@ -41,7 +41,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
   color
   ;;4 integer array representation of the rgba values. Rgba values
   ;;must be between 0 and 255 inclusive
-  :rgb
+  :rgba
   ;;3 float array holding the HSL values for this color. The
   ;;saturation and lightness must be between 0.0 and 100.0. Hue must
   ;;be between 0.0 and 360.0
@@ -87,6 +87,11 @@ http://www.w3.org/TR/css3-color/#hsl-color
   [rgb-int]
   (and (integer? rgb-int) (and (>= rgb-int 0) (<= rgb-int 255))))
 
+(defn clamp-rgb-int
+  "Clamp the integer value to be within the range 0 - 255"
+  [rgb-int]
+  (max (min rgb-int 255) 0))
+
 (defn unit-float?
   "Return true if passed in float is in the range 0.0 - 1.0. False otherwise"
   [fval]
@@ -106,8 +111,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
   "Check that the passed in float is in the range 0.0 - 1.0, then
 convert it to the appropriate integer in the range 0 - 255"
   [fval]
-  (throw-if-not (float? fval) "fval must be a float: %s" fval)
-  (throw-if-not (and (>= fval 0.0) (<= fval 1.0))
+  (throw-if-not (unit-float? fval)
                 "fval must be a float between 0.0 and 0.1: %s" fval)
   (int (+ 0.5 (* fval 255))))
 
@@ -271,22 +275,36 @@ Multiple Arg
   (create-color [(.getRed color) (.getGreen color)
                  (.getBlue color) (.getAlpha color)]))
 
-(defn red "Return the red (int) component of this color" [color] ((:rgb color) 0))
-(defn green "Return the green (int) component of this color" [color] ((:rgb color) 1))
-(defn blue "Return the blue (int) component of this color" [color] ((:rgb color) 2))
+(defn red "Return the red (int) component of this color" [color] ((:rgba color) 0))
+(defn green "Return the green (int) component of this color" [color] ((:rgba color) 1))
+(defn blue "Return the blue (int) component of this color" [color] ((:rgba color) 2))
 (defn hue "Return the hue (float) component of this color" [color] ((:hsl color) 0))
 (defn saturation "Return the saturation (float) component of this color" [color] ((:hsl color) 1))
 (defn lightness "Return the lightness (float) component of this color" [color] ((:hsl color) 2))
-(defn alpha "Return the alpha (int) component of this color" [color] ((:rgb color) 3))
+(defn alpha "Return the alpha (int) component of this color" [color] ((:rgba color) 3))
+
+(defn rgb-int
+  "Return a integer (RGB) representation of this color"
+  [color]
+  (rgb-int-from-components (red color) (green color) (blue color)))
 
 (defn rgba-int
   "Return a integer (RGBA) representation of this color"
   [color]
   (rgba-int-from-components (red color) (green color) (blue color) (alpha color)))
 
+(defn color-name
+  "If there is an entry for this color value in the symbolic color
+names map, return that. Otherwise, return the hexcode string of this
+color's rgba integer value"
+  [color]
+  (if-let [color-name (html4-colors-rgbnum-to-name (rgb-int color))]
+    color-name
+    (format "%#08x" (rgba-int color))))
+
 (defmethod print-method ::color [color writer]
-  (print-method (format "#<color: %#08x R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
-                        (rgba-int color) (red color) (green color) (blue color)
+  (print-method (format "#<color: %s R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
+                        (color-name color) (red color) (green color) (blue color)
                         (hue color) (saturation color) (lightness color) (alpha color))
                 writer))
 
@@ -321,6 +339,15 @@ Multiple Arg
   [rgba-int]
   (conj (rgb-int-to-components rgba-int)
         (bit-shift-right rgba-int 24)))
+
+;;Color ops
+
+(defn color-add
+  "Add the rgba elements of color1 to color2, clamped to the range 0 -
+255, returning the resultant color."
+  [color1 color2]
+  (create-color (vec (map clamp-rgb-int (map + (:rgba color1) (:rgba color2))))))
+
 
 (def html4-colors-name-to-rgbnum
      {
