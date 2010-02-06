@@ -341,13 +341,28 @@ color's rgba integer value"
         (bit-shift-right rgba-int 24)))
 
 ;;Color ops
+(defmacro def-color-bin-op
+  "Macro for creating binary operations between two colors.
 
-(defn color-add
-  "Add the rgba elements of color1 to color2, clamped to the range 0 -
-255, returning the resultant color."
-  [color1 color2]
-  (create-color (vec (map clamp-rgb-int (map + (:rgba color1) (:rgba color2))))))
+Arguments
+name - the name of the operation.
 
+bin-op - the function that takes two values, producing one from
+those. (eg: + - * /). This op will be applied pairwise to the
+repective color's rgba components to create a new color with the
+resultant rgba components.
+
+Result
+color - a new color that is the result of the binary operation."
+  [name bin-op]
+  `(defn ~name
+     [color1# color2#]
+     (create-color (vec (map clamp-rgb-int (map ~bin-op (:rgba color1#) (:rgba color2#)))))))
+
+(def-color-bin-op color-add +)
+(def-color-bin-op color-sub -)
+(def-color-bin-op color-mult *)
+(def-color-bin-op color-div /)
 
 (def html4-colors-name-to-rgbnum
      {
