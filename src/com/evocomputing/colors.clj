@@ -25,7 +25,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core math)))
+  (:use (clojure.contrib core except math)))
 
 (declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
          html4-colors-rgbnum-to-name html4-colors-rgb-to-name
@@ -68,8 +68,8 @@ http://www.w3.org/TR/css3-color/#hsl-color
   ([arg & others]
      (let [args (conj others arg)]
        (cond
-        (and (keyword? arg) (allowable-rgb-keys arg)) ::rgb-map
-        (and (keyword? arg) (allowable-hsl-keys arg)) ::hsl-map
+        (and (keyword? arg) (some allowable-rgb-keys args)) ::rgb-map
+        (and (keyword? arg) (some allowable-hsl-keys args)) ::hsl-map
         (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
         true (throw (IllegalArgumentException.
                      (format "Don't know how to process args: %s" arg)))))))
@@ -81,16 +81,85 @@ http://www.w3.org/TR/css3-color/#hsl-color
      ~@body
       {:type ::color}))
 
+(defn rgb-int?
+  "If the passed in value is an integer in the range 0 - 255
+  inclusive, return true, otherwise return false"
+  [rgb-int]
+  (and (integer? rgb-int) (and (>= rgb-int 0) (<= rgb-int 255))))
+
+(defn unit-float?
+  "Return true if passed in float is in the range 0.0 - 1.0. False otherwise"
+  [fval]
+  (and (>= fval 0.0) (<= fval 1.0)))
+
+(defn percent-float?
+  "Return true if passed in float is in the range 0.0 - 100.0. False otherwise"
+  [fval]
+  (and (>= fval 0.0) (<= fval 100.0)))
+
+(defn circle-float?
+  "Return true if passed in float is in the range 0.0 - 360.0. False otherwise"
+  [fval]
+  (and (>= fval 0.0) (<= fval 360.0)))
+
+(defn check-convert-unit-float-to-int
+  "Check that the passed in float is in the range 0.0 - 1.0, then
+convert it to the appropriate integer in the range 0 - 255"
+  [fval]
+  (throw-if-not (float? fval) "fval must be a float: %s" fval)
+  (throw-if-not (and (>= fval 0.0) (<= fval 1.0))
+                "fval must be a float between 0.0 and 0.1: %s" fval)
+  (int (+ 0.5 (* fval 255))))
+
+(defn maybe-convert-alpha
+  "If alpha is a float value, try to convert to integer in range 0 -
+255, otherwise return as-is"
+  [alpha]
+  (if (rgb-int? alpha) alpha
+      (throw-if-not (float? alpha)
+                    "alpha must be an integer in range 0 - 255 or float: %s" alpha))
+  (check-convert-unit-float-to-int alpha))
+
+(defn check-rgba
+  "Check that every element in the passed in rgba sequence is an
+integer in the range 0 - 255"
+  ([rgba]
+     (throw-if-not (and (= (count rgba) 4) (every? #'rgb-int? rgba))
+                   "Must contain 4 integers in range 0 - 255: %s" rgba)
+     rgba)
+  ([r g b a]
+     (throw-if-not (every? #'rgb-int? [r g b a])
+     "Must contain 4 integers in range 0 - 255: %s" [r g b a])))
+
+(defn check-hsl
+  "Check that every element is of the format:
+- 1st, H (Hue): Float value in the range of: 0.0 - 360.0
+- 2nd, S (Saturation): Float value in the range: 0.0 - 100.0
+- 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0
+"
+  ([hsl]
+     (throw-if-not (= (count hsl) 3)
+                   "Must contain 3 floats representing HSL: %s" hsl)
+     (check-hsl (hsl 0) (hsl 1) (hsl 2))
+     hsl)
+  ([h s l] (throw-if-not (and (circle-float? h)
+                              (percent-float? s) (percent-float? l))
+                         "Elements must be of the form:
+H (Hue): Float value in the range of: 0.0 - 360.0
+S (Saturation): Float value in the range: 0.0 - 100.0
+L (Lightness or Luminance): Float value in the range 0.0 - 100.0
+%s %s %s" h s l)))
+
 (defmulti create-color
-  "Create a color struct using the passed in args. This will create a
-  color struct that has RGBA integer values in the range:
+  "Create a color struct using the passed in args.
+
+This will create a color struct that has RGBA integer values in the range:
 - R (Red): Integer in range 0 - 255
 - G (Green): Integer in range 0 - 255
 - B (Blue): Integer in range 0 - 255
 - A (Alpha): Integer in range 0 - 255, with default as 255 (100% opacity)
 
-  and HSL values with the range:
-
+And HSL values with the range:
 - H (Hue): Float value in the range of: 0.0 - 360.0
 - S (Saturation): Float value in the range: 0.0 - 100.0
 - L (Lightness or Luminance): Float value in the range 0.0 - 100.0
@@ -172,6 +241,7 @@ Multiple Arg
         rgba (if (or (= 3 (count rgb-array)) (nil? (rgb-array 3)))
                (conj rgb-array 255)
                rgb-array)]
+    (check-rgba rgba)
     (create-color-with-meta
       (struct color rgba
               (rgb-to-hsl (rgba 0) (rgba 1) (rgba 2))))))
@@ -183,18 +253,18 @@ Multiple Arg
                            (map #(some % ks)
                                 '(#{:r :red} #{:g :green} #{:b :blue}))))
         alpha (or (:a rgb-map) (:alpha rgb-map))
-        rgba (if alpha (conj rgb alpha) (conj rgb 255))]
+        rgba (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
     (create-color rgba)))
 
 (defmethod create-color ::hsl-map [hsl-map & others]
   (let [hsl-map (if others (apply assoc {} (vec (conj others hsl-map))) hsl-map)
         ks (keys hsl-map)
-        hsl (into [] (map #(hsl-map %)
-                           (map #(some % ks)
-                                '(#{:h :hue} #{:s :saturation} #{:l :lightness}))))
+        hsl (check-hsl (into [] (map #(hsl-map %)
+                                     (map #(some % ks)
+                                          '(#{:h :hue} #{:s :saturation} #{:l :lightness})))))
         rgb (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))
         alpha (or (:a hsl-map) (:alpha hsl-map))
-        rgba (if alpha (conj rgb alpha) (conj rgb 255))]
+        rgba (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
     (create-color rgba)))
 
 (defmethod create-color Color [color]
