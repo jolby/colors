@@ -42,6 +42,7 @@
   )
 
 (deftest test-create-color
+  (is (= :com.evocomputing.colors/color (type (create-color "#fff"))))
   (is (= :com.evocomputing.colors/color (type (create-color "0x000000"))))
   (is (= :com.evocomputing.colors/color (type (create-color "#000000"))))
   (is (= :com.evocomputing.colors/color (type (create-color 0x000000))))
@@ -55,8 +56,13 @@
   (is (= :com.evocomputing.colors/color (type (create-color :h 120.0 :s 100.0 :l 50.0))))
   (is (= :com.evocomputing.colors/color (type (create-color (Color. 255 0 0)))))
   ;; test bad input checking
+  (is (thrown? Exception (create-color "#badhexstring")))
   (is (thrown? Exception (create-color 355 0 0)))
   (is (thrown? Exception (create-color 255 0)))
   (is (thrown? Exception (create-color :h 120.0 :s 200.0 :l 50.0)))
   (is (thrown? Exception (create-color :h 420.0 :s 100.0 :l 50.0)))
+  )
+
+(deftest test-adjust-alpha
+  (is (= 192 (alpha (adjust-alpha (create-color 0 0 0 0.50) 0.25))))
   )

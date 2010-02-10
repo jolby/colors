@@ -130,7 +130,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
   [hue]
   (mod hue 360.0))
 
-(defn check-convert-unit-float-to-int
+(defn unit-float-to-rgba-int
   "Check that the passed in float is in the range 0.0 - 1.0, then
 convert it to the appropriate integer in the range 0 - 255"
   [fval]
@@ -138,14 +138,32 @@ convert it to the appropriate integer in the range 0 - 255"
                 "fval must be a float between 0.0 and 0.1: %s" fval)
   (int (+ 0.5 (* fval 255))))
 
+(defn rgb-int-to-unit-float
+ "Convert the integer in range 0 - 255 to float in range 0.0 - 1.0"
+ [rgb-int]
+ (throw-if-not (rgb-int? rgb-int) "Must be integer in range 0 - 255")
+ (/ rgb-int 255.0))
+
 (defn maybe-convert-alpha
   "If alpha is a float value, try to convert to integer in range 0 -
 255, otherwise return as-is"
   [alpha]
   (if (rgb-int? alpha) alpha
-      (throw-if-not (float? alpha)
-                    "alpha must be an integer in range 0 - 255 or float: %s" alpha))
-  (check-convert-unit-float-to-int alpha))
+      (do
+        (throw-if-not (unit-float? alpha)
+                      "alpha must be an integer in range 0 - 255 or unit float: %s" alpha)
+        (unit-float-to-rgba-int alpha))))
+
+(defn check-rgb
+  "Check that every element in the passed in rgba sequence is an
+integer in the range 0 - 255"
+  ([rgb]
+     (throw-if-not (and (= (count rgb) 3) (every? #'rgb-int? rgb))
+                   "Must contain 3 integers in range 0 - 255: %s" rgb)
+     rgb)
+  ([r g b]
+     (throw-if-not (every? #'rgb-int? [r g b])
+     "Must contain 3 integers in range 0 - 255: %s" [r g b])))
 
 (defn check-rgba
   "Check that every element in the passed in rgba sequence is an
@@ -265,9 +283,9 @@ Multiple Arg
 (defmethod create-color ::rgb-array [rgb-array & others]
   (let [rgb-array (if others (vec (conj others rgb-array)) rgb-array)
         ;;if alpha wasn't provided, use default of 255
-        rgba (if (or (= 3 (count rgb-array)) (nil? (rgb-array 3)))
-               (conj rgb-array 255)
-               rgb-array)]
+        alpha (if (or (= 3 (count rgb-array)) (nil? (rgb-array 3))) 255
+                  (maybe-convert-alpha (rgb-array 3)))
+        rgba (conj (into [] (take 3 rgb-array)) alpha) ]
     (check-rgba rgba)
     (create-color-with-meta
       (struct color rgba
@@ -290,9 +308,9 @@ Multiple Arg
                                      (map #(some % ks)
                                           '(#{:h :hue} #{:s :saturation} #{:l :lightness})))))
         rgb (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))
-        alpha (or (:a hsl-map) (:alpha hsl-map))
+        alpha (maybe-convert-alpha (or (:a hsl-map) (:alpha hsl-map) 255))
         rgba (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
-    (create-color rgba)))
+    (create-color-with-meta (struct color rgba hsl))))
 
 (defmethod create-color Color [color]
   (create-color [(.getRed color) (.getGreen color)
@@ -399,8 +417,8 @@ color - a new color that is the result of the binary operation."
         rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
                                       (take 3 (:rgba color1)) (take 3 (:rgba color2))))
         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
-    (println (format "p: %s, w: %s, a: %s, w1: %s, w2: %s, rgb: %s, adj-alpha: %s, rgba: %s"
-                     p w a w1 w2 rgb adj-alpha (conj rgb adj-alpha)))
+    ;;(println (format "p: %s, w: %s, a: %s, w1: %s, w2: %s, rgb: %s, adj-alpha: %s, rgba: %s"
+    ;;                 p w a w1 w2 rgb adj-alpha (conj rgb adj-alpha)))
     (create-color (conj rgb adj-alpha))))
 
 (defn adjust-hue [color degrees]
@@ -430,11 +448,12 @@ color - a new color that is the result of the binary operation."
                 :l (clamp-percent-float (- (lightness color) percent))
                 :a (alpha color)))
 
-(defn adjust-alpha [color percent]
+(defn adjust-alpha [color unit-float-adj]
   (create-color :h (hue color)
                 :s (saturation color)
                 :l (lightness color)
-                :a (clamp-percent-float (alpha color) percent)))
+                :a (clamp-unit-float (+ (rgb-int-to-unit-float (alpha color))
+                                        unit-float-adj))))
 
 (defn grayscale [color]
   (desaturate color 100.0))
@@ -524,12 +543,12 @@ http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL
          delta (- max min)
          l (/ (+ max min) 2.0)
          h (condp = max
-                  min 0
+                  min 0.0
                   r (* 60 (/ (- g b) delta))
                   g (+ 120 (* 60 (/ (- b r) delta)))
                   b (+ 240 (* 60 (/ (- r g) delta))))
          s (cond
-            (= max min) 0
+            (= max min) 0.0
             (< l 0.5) (/ delta (* 2 l))
             :else (/ delta (- 2 (* 2 l))))]
-        [(mod h 360) (* 100 s) (* 100 l)]))
+        [(mod h 360.0) (* 100.0 s) (* 100.0 l)]))
