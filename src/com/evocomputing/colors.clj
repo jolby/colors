@@ -29,7 +29,8 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
 (declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
          html4-colors-rgbnum-to-name html4-colors-rgb-to-name
-         rgb-int-to-components rgba-int-to-components rgba-int-from-components
+         rgb-int-to-components rgba-int-to-components
+         rgb-int-from-components rgba-int-from-components
          rgb-to-hsl hsl-to-rgb)
 
 (defstruct
@@ -81,16 +82,20 @@ http://www.w3.org/TR/css3-color/#hsl-color
      ~@body
       {:type ::color}))
 
+(defn hexstring-to-rgba-int
+  [hexstr]
+  (if-let [matches (re-find #"(^#|^0[Xx])([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" hexstr)]
+    (Long/decode
+     (condp =  (count (matches 2))
+       3 (apply str "0xff" (map #(str % %) (matches 2)))
+       6 (apply str "0xff" (matches 2))
+       8 (apply str "0x" (matches 2))))))
+
 (defn rgb-int?
   "If the passed in value is an integer in the range 0 - 255
   inclusive, return true, otherwise return false"
   [rgb-int]
   (and (integer? rgb-int) (and (>= rgb-int 0) (<= rgb-int 255))))
-
-(defn clamp-rgb-int
-  "Clamp the integer value to be within the range 0 - 255"
-  [rgb-int]
-  (max (min rgb-int 255) 0))
 
 (defn unit-float?
   "Return true if passed in float is in the range 0.0 - 1.0. False otherwise"
@@ -106,6 +111,24 @@ http://www.w3.org/TR/css3-color/#hsl-color
   "Return true if passed in float is in the range 0.0 - 360.0. False otherwise"
   [fval]
   (and (>= fval 0.0) (<= fval 360.0)))
+
+(defn clamp-rgb-int
+  "Clamp the integer value to be within the range 0 - 255"
+  [rgb-int]
+  (max (min rgb-int 255) 0))
+
+(defn clamp-unit-float
+  [ufloat]
+  (max (min ufloat 1.0) 0.0))
+
+(defn clamp-percent-float
+  [pfloat]
+  (max (min pfloat 100.0) 0.0))
+
+(defn clamp-hue
+  "Clamp the hue value so that is lies on the range 0.0 - 360.0"
+  [hue]
+  (mod hue 360.0))
 
 (defn check-convert-unit-float-to-int
   "Check that the passed in float is in the range 0.0 - 1.0, then
@@ -142,7 +165,7 @@ integer in the range 0 - 255"
 - 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0
 "
   ([hsl]
-     (throw-if-not (= (count hsl) 3)
+     (throw-if-not (and (= (count hsl) 3) (not (some nil? hsl)))
                    "Must contain 3 floats representing HSL: %s" hsl)
      (check-hsl (hsl 0) (hsl 1) (hsl 2))
      hsl)
@@ -234,7 +257,7 @@ Multiple Arg
       (if-let [rgb-int (html4-colors-name-to-rgbnum colorsym)]
         (create-color (rgb-int-to-components rgb-int))
         (create-color
-         (rgba-int-to-components (Integer/decode colorsym)))))))
+         (rgba-int-to-components (hexstring-to-rgba-int colorsym)))))))
 
 (defmethod create-color ::rgb-int [rgb-int]
   (create-color (rgba-int-to-components rgb-int)))
@@ -363,6 +386,61 @@ color - a new color that is the result of the binary operation."
 (def-color-bin-op color-sub -)
 (def-color-bin-op color-mult *)
 (def-color-bin-op color-div /)
+
+(defn mix [color1 color2 weight]
+  (let [p (/ weight 100.0)
+        w (- (* p 2) 1)
+        a (- (alpha color1) (alpha color2))
+        w1 (/ (+ 1
+                 (if (= (* w a) -1) w
+                     (/ (+ w a) (+ 1 (* w a)))))
+              2.0)
+        w2 (- 1 w1)
+        rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
+                                      (take 3 (:rgba color1)) (take 3 (:rgba color2))))
+        adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
+    (println (format "p: %s, w: %s, a: %s, w1: %s, w2: %s, rgb: %s, adj-alpha: %s, rgba: %s"
+                     p w a w1 w2 rgb adj-alpha (conj rgb adj-alpha)))
+    (create-color (conj rgb adj-alpha))))
+
+(defn adjust-hue [color degrees]
+  (create-color :h (clamp-hue (+ (hue color) degrees))
+                :s (saturation color)
+                :l (lightness color) :a (alpha color)))
+
+(defn saturate [percent]
+  (create-color :h (hue color)
+                :s (clamp-percent-float (+ (saturation color) percent))
+                :l (lightness color) :a (alpha color)))
+
+(defn desaturate [percent]
+  (create-color :h (hue color)
+                :s (clamp-percent-float (- (saturation color) percent))
+                :l (lightness color) :a (alpha color)))
+
+(defn lighten [color percent]
+  (create-color :h (hue color)
+                :s (saturation color)
+                :l (clamp-percent-float (+ (lightness color) percent))
+                :a (alpha color)))
+
+(defn darken  [color percent]
+  (create-color :h (hue color)
+                :s (saturation color)
+                :l (clamp-percent-float (- (lightness color) percent))
+                :a (alpha color)))
+
+(defn adjust-alpha [color percent]
+  (create-color :h (hue color)
+                :s (saturation color)
+                :l (lightness color)
+                :a (clamp-percent-float (alpha color) percent)))
+
+(defn grayscale [color]
+  (desaturate color 100.0))
+
+(defn opposite [color]
+  (adjust-hue color 180))
 
 (def html4-colors-name-to-rgbnum
      {
