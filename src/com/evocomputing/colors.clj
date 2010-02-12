@@ -25,7 +25,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core except math)))
+  (:use (clojure.contrib core except math str-utils seq-utils)))
 
 (declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
          html4-colors-rgbnum-to-name html4-colors-rgb-to-name
@@ -54,33 +54,6 @@ http://www.w3.org/TR/css3-color/#hsl-color
 (def allowable-hsl-keys
      #{:h :hue :s :saturation :l :lightness})
 
-(defn create-color-dispatch
-  ""
-  ([args]
-  (cond
-   (or (symbol? args) (string? args) (keyword? args)) ::symbolic-color
-   (integer? args) ::rgb-int
-   (and (map? args) (some allowable-rgb-keys (keys args))) ::rgb-map
-   (and (map? args) (some allowable-hsl-keys (keys args))) ::hsl-map
-   (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
-   (= (class args) Color) Color
-   true (throw (IllegalArgumentException.
-                (format "Don't know how to process args: %s" args)))))
-  ([arg & others]
-     (let [args (conj others arg)]
-       (cond
-        (and (keyword? arg) (some allowable-rgb-keys args)) ::rgb-map
-        (and (keyword? arg) (some allowable-hsl-keys args)) ::hsl-map
-        (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
-        true (throw (IllegalArgumentException.
-                     (format "Don't know how to process args: %s" arg)))))))
-
-(defmacro create-color-with-meta
-  "Create color with type meta"
-  [& body]
-  `(with-meta
-     ~@body
-      {:type ::color}))
 
 (defn hexstring-to-rgba-int
   [hexstr]
@@ -90,6 +63,36 @@ http://www.w3.org/TR/css3-color/#hsl-color
        3 (apply str "0xff" (map #(str % %) (matches 2)))
        6 (apply str "0xff" (matches 2))
        8 (apply str "0x" (matches 2))))))
+
+;;Resolution/normalize code taken from Ruby color:
+;;http://rubyforge.org/projects/color
+(def #^{:doc "The maximum resolution for colour math; if any value is less than or
+   equal to this value, it is treated as zero."}
+     color-epsilon 0.00001)
+
+(def #^{:doc "The tolerance for comparing the components of two colours. In general,
+  colours are considered equal if all of their components are within this
+  tolerance value of each other."}
+ color-tolerance 0.0001)
+
+(defn within-tolerance?
+  [fval1 fval2]
+  (<= (abs (- fval1 fval2)) color-tolerance))
+
+(defn near-zero?
+  "Returns true if the fvalue is less than color-epsilon."
+  [fval]
+  (<= (abs fval) color-epsilon))
+
+(defn near-zero-or-less?
+  "Returns true if the fvalue is within color-epsilon of zero or less than zero."
+  [fval]
+  (or (< fval 0.0) (near-zero? fval)))
+
+(defn near-one?
+  "Returns true if fvalue is within color-epsilon of one"
+  [fval]
+  (near-zero? (- 1.0 fval)))
 
 (defn rgb-int?
   "If the passed in value is an integer in the range 0 - 255
@@ -186,14 +189,43 @@ integer in the range 0 - 255"
      (throw-if-not (and (= (count hsl) 3) (not (some nil? hsl)))
                    "Must contain 3 floats representing HSL: %s" hsl)
      (check-hsl (hsl 0) (hsl 1) (hsl 2))
-     hsl)
-  ([h s l] (throw-if-not (and (circle-float? h)
+     [(clamp-hue (hsl 0)) (hsl 1) (hsl 2)])
+  ([h s l] (throw-if-not (and (circle-float? (clamp-hue h))
                               (percent-float? s) (percent-float? l))
                          "Elements must be of the form:
 H (Hue): Float value in the range of: 0.0 - 360.0
 S (Saturation): Float value in the range: 0.0 - 100.0
 L (Lightness or Luminance): Float value in the range 0.0 - 100.0
 %s %s %s" h s l)))
+
+
+(defn create-color-dispatch
+  ""
+  ([args]
+  (cond
+   (or (symbol? args) (string? args) (keyword? args)) ::symbolic-color
+   (integer? args) ::rgb-int
+   (and (map? args) (some allowable-rgb-keys (keys args))) ::rgb-map
+   (and (map? args) (some allowable-hsl-keys (keys args))) ::hsl-map
+   (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
+   (= (class args) Color) Color
+   true (throw (IllegalArgumentException.
+                (format "Don't know how to process args: %s" args)))))
+  ([arg & others]
+     (let [args (conj others arg)]
+       (cond
+        (and (keyword? arg) (some allowable-rgb-keys args)) ::rgb-map
+        (and (keyword? arg) (some allowable-hsl-keys args)) ::hsl-map
+        (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
+        true (throw (IllegalArgumentException.
+                     (format "Don't know how to process args: %s" arg)))))))
+
+(defmacro create-color-with-meta
+  "Create color with type meta"
+  [& body]
+  `(with-meta
+     ~@body
+      {:type ::color}))
 
 (defmulti create-color
   "Create a color struct using the passed in args.
@@ -334,6 +366,16 @@ Multiple Arg
   [color]
   (rgba-int-from-components (red color) (green color) (blue color) (alpha color)))
 
+(defn rgba-hexstr
+  "Return the hexcode string representation of this color"
+  [color]
+  (format "%#08X" (rgba-int color)))
+
+(defn rgb-hexstr
+  "Return the hexcode string representation of this color"
+  [color]
+  (format "%#06X" (rgb-int color)))
+
 (defn color-name
   "If there is an entry for this color value in the symbolic color
 names map, return that. Otherwise, return the hexcode string of this
@@ -348,6 +390,15 @@ color's rgba integer value"
                         (color-name color) (red color) (green color) (blue color)
                         (hue color) (saturation color) (lightness color) (alpha color))
                 writer))
+
+(defn color=
+  "Return true if rgba components are equal, and hsl float components
+are within tolerance"
+  [color1 color2]
+  (and (= (:rgba color1) (:rgba color2))
+       (and (<= (abs (- (hue color1) (hue color2))) color-tolerance)
+            (<= (abs (- (saturation color1) (saturation color2))) color-tolerance)
+            (<= (abs (- (lightness color1) (lightness color2))) color-tolerance))))
 
 (defn rgb-int-from-components
   "Convert a vector of the 3 rgb integer values into a color given in
@@ -460,6 +511,19 @@ color - a new color that is the result of the binary operation."
 
 (defn opposite [color]
   (adjust-hue color 180))
+
+(defn rainbow-hsl
+  ""
+  [numcolors & opts]
+  (let [opts (merge {:s 50.0 :l 70.0 :start 0 :end (* 360 (/ (- numcolors 1) numcolors))} opts)
+        hvals (range (:start opts) (inc (:end opts)) (/ (:end opts) (dec numcolors)))]
+    (printf (format "hvals: %s" (vec hvals)))
+    (map #(create-color :h (float %) :s (:s opts) :l (:l opts))
+         hvals)))
+
+(defn sequential-hsl
+  ""
+  [numcolors & opts])
 
 (def html4-colors-name-to-rgbnum
      {
