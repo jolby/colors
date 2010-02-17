@@ -54,7 +54,6 @@ http://www.w3.org/TR/css3-color/#hsl-color
 (def allowable-hsl-keys
      #{:h :hue :s :saturation :l :lightness})
 
-
 (defn hexstring-to-rgba-int
   [hexstr]
   (if-let [matches (re-find #"(^#|^0[Xx])([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" hexstr)]
