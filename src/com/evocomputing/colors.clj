@@ -368,12 +368,12 @@ Multiple Arg
 (defn rgba-hexstr
   "Return the hexcode string representation of this color"
   [color]
-  (format "%#08X" (rgba-int color)))
+  (format "#%08X" (rgba-int color)))
 
 (defn rgb-hexstr
   "Return the hexcode string representation of this color"
   [color]
-  (format "%#06X" (rgb-int color)))
+  (format "#%06X" (rgb-int color)))
 
 (defn color-name
   "If there is an entry for this color value in the symbolic color
