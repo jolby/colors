@@ -545,12 +545,12 @@ Optional Arguments:
 
 (defn diverge-hsl
   "Compute a set of colors diverging
-     from a neutral center (grey or white, without color) to two
-     different extreme colors (blue and red by default). For the
-     diverging HSL colors, again two hues :h are needed, a maximal
-     saturation ':s' and two lightnesses ':l'.  The colors are then created by
-     an interpolation between the full color hsl1,
-     a neutral color hsl and the other full color hsl2.
+from a neutral center (grey or white, without color) to two
+different extreme colors (blue and red by default). For the
+diverging HSL colors, again two hues :h are needed, a maximal
+saturation ':s' and two lightnesses ':l'.  The colors are then created by
+an interpolation between the full color hsl1,
+a neutral color hsl and the other full color hsl2.
 
 Arguments:
 numcolors: Number of colors to be produced in this pallette.
@@ -580,8 +580,8 @@ be increased (1 = linear, 2 = quadratic, etc.) (default 1.5)
 
 (defn sequential-hsl
   "Creates a sequential palette starting at the full color
-   (h :s-start :l-start) through to a light color (h :s-end :l-end) by
-   interpolation.
+ (h :s-start :l-start) through to a light color (h :s-end :l-end) by
+interpolation.
 
 Arguments:
 numcolors: Number of colors to be produced in this pallette.
@@ -610,9 +610,9 @@ be increased (1 = linear, 2 = quadratic, etc.)
 
 (defn heat-hsl
   " Create heat pallette in HSL space. By default, it goes from a red to a yellow hue, while
-     simultaneously going to lighter colors (i.e., increasing
-     lightness) and reducing the amount of color (i.e., decreasing
-     saturation).
+simultaneously going to lighter colors (i.e., increasing
+lightness) and reducing the amount of color (i.e., decreasing
+saturation).
 
 Arguments:
 numcolors: Number of colors to be produced in this pallette.
