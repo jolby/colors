@@ -514,9 +514,11 @@ color - a new color that is the result of the binary operation."
 
 (defn inclusive-seq [n start end]
   "Return n evenly spaced points along the range start - end (inclusive)"
-  (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
-    (if (= idx n) acc
-        (recur (conj acc num) step (+ step num) (inc idx)))))
+  (when (< n 1) (throw-arg "n must be 1 or greater"))
+  (if (= n 1) start
+      (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
+            (if (= idx n) acc
+                (recur (conj acc num) step (+ step num) (inc idx))))))
 
 (defn rainbow-hsl
   "Computes a rainbow of colors (qualitative palette) defined by
@@ -541,6 +543,41 @@ Optional Arguments:
     (map #(create-color :h (float %) :s (:s opts) :l (:l opts))
          hvals)))
 
+(defn diverge-hsl
+  "Compute a set of colors diverging
+     from a neutral center (grey or white, without color) to two
+     different extreme colors (blue and red by default). For the
+     diverging HSL colors, again two hues :h are needed, a maximal
+     saturation ':s' and two lightnesses ':l'.  The colors are then created by
+     an interpolation between the full color hsl1,
+     a neutral color hsl and the other full color hsl2.
+
+Arguments:
+numcolors: Number of colors to be produced in this pallette.
+
+Optional Arguments:
+:h-start (keyword) starting hue (default 260)
+:h-end (keyword) ending hue (default 0)
+:s (keyword) saturation. 0.0 - 100.0 (default 80.0)
+:l-start (keyword) starting lightness. 0.0 - 100.0. (default 30.0)
+:l-end (keyword) ending lightness. 0.0 - 100.0. (default 90.0)
+:power (keyword) control parameter determining how saturation and lightness should
+be increased (1 = linear, 2 = quadratic, etc.) (default 1.5)
+"
+
+  [numcolors & opts]
+  (let [opts (merge {:h-start 260 :h-end 0
+                     :s 80.0
+                     :l-start 30.0 :l-end 90.0
+                     :power 1.5}
+                    (when opts (apply assoc {} opts)))
+        diff-l (- (:l-end opts) (:l-start opts))]
+    (map #(create-color :h (if (> % 0) (:h-start opts) (:h-end opts))
+                        :s (* (:s opts) (Math/pow (Math/abs %) (:power opts)))
+                        :l (- (:l-end opts) (* diff-l (Math/pow (Math/abs %) (:power opts)))))
+         (inclusive-seq numcolors -1.0 1.0))))
+
+
 (defn sequential-hsl
   "Creates a sequential palette starting at the full color
    (h :s-start :l-start) through to a light color (h :s-end :l-end) by
@@ -555,7 +592,7 @@ Optional Arguments:
 :l-start (keyword) starting lightness. 0.0 - 100.0. (default 30.0)
 :s-end (keyword) ending saturation. 0.0 - 100.0 (default 0.0)
 :l-end (keyword) ending lightness. 0.0 - 100.0. (default 90.0)
-:power (keyword) control parameter determining how chroma and luminance should
+:power (keyword) control parameter determining how saturation and lightness should
 be increased (1 = linear, 2 = quadratic, etc.)
 "
 
@@ -608,7 +645,7 @@ be increased (1 = linear, 2 = quadratic, etc.)
 
 (defn terrain-hsl
   "The 'terrain_hcl' palette simply calls 'heat_hcl' with
-different parameters, providing colors "
+different parameters, providing suitable terrain colors."
   [numcolors & opts]
   (heat-hsl numcolors :h-start 0 :h-end 90
             :s-start 100.0 :s-end 30.0
