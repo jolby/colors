@@ -355,6 +355,12 @@ Multiple Arg
 (defn lightness "Return the lightness (float) component of this color" [color] ((:hsl color) 2))
 (defn alpha "Return the alpha (int) component of this color" [color] ((:rgba color) 3))
 
+
+(defn awt-color
+  "Return a java.awt.Color object using this color's rgba components"
+  [color]
+  (Color. (rgba-int color) true))
+
 (defn rgb-int
   "Return a integer (RGB) representation of this color"
   [color]
