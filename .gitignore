@@ -6,3 +6,4 @@ classes
 priv
 autodoc/**
 resources/**
+*.jar
