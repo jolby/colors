@@ -5,18 +5,70 @@
  
   [[http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb]]
 
-  In the future it would be great to have some sort of color theme
-  abilities found in R's ColorBrewer package.
-
   Further references:
-  - HSL and HSV: [[http://en.wikipedia.org/wiki/Luminance-Hue-Saturation]]
-  - RGB color space: [[http://en.wikipedia.org/wiki/RGB_color_space]]
-  - [[http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB]]
-  - [[http://www.w3.org/TR/css3-color/#hsl-color]]
+  - HSL and HSV:
+    [[http://en.wikipedia.org/wiki/Luminance-Hue-Saturation]]
+  - RGB color space:
+    [[http://en.wikipedia.org/wiki/RGB_color_space]]
+  - SASS color module:
+    http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
+  - R colorspace package:
+    http://cran.r-project.org/web/packages/colorspace/index.html
+  - ColorBrewer
+    http://colorbrewer.org/
+  - R ColorBrewer palettes:
+    http://sekhon.berkeley.edu/library/RColorBrewer/html/ColorBrewer.html
 * Install
-  TODO
+  Colors is now up on clojars, so you can add it as a dependency to
+  your lein project like normal:
+
+#+BEGIN_EXAMPLE 
+  :dependencies [[com.evocomputing/colors "1.0.0-SNAPSHOT"]
+                 ...other deps ]]
+#+END_EXAMPLE
+
 * Example Usage
-  TODO- see the tests for now
+  
+** Create Color Objects
+   The first point of entry is to create a color object. This package
+   takes a wide range of representations to be passed to the
+   create-color multi function
+#+BEGIN_EXAMPLE 
+(use 'com.evocomputing.colors)
+
+;;Symbolic: Either a string or keyword or symbol that matches an entry
+;;in the symbolic color pallete. Currently, this is defaults to the
+;;html4 colors map and x11 colors map, but the end user of this library
+;;can set any named palette they want.
+
+(create-color "blue")
+(create-color :blue)
+
+;;Hexstring: A hex string representation of an RGB(A) color
+
+(create-color "0xFFCCAA")
+(create-color "#FFCCAA")
+(create-color "Ox80FFFF00") ;; alpha = 128
+
+;; Integer: An integer representation of an RGB(A) color
+;;(create-color 0xFFCCAA) ;; integer in hexidecimal format
+;;(create-color 16764074) ;; same integer in decimal format
+
+;;Sequence or array of RGB(A) integers
+(create-color [255 0 0])
+(create-color [255 0 0 128]) ;;alpha = 128
+
+;;Map of either RGB (A) kw/values or HSL(A) kw/values
+;;Allowable RGB keys: :r :red :g :green :b :blue
+;;Allowable HSL keys: :h :hue :s :saturation :l :lightness
+
+(create-color {:r 255 :g 0 :blue 0})
+(create-color {:r 255 :g 0 :blue 0 :a 128})
+(create-color {:h 120.0 :s 100.0 :l 50.0})
+(create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
+
+#+END_EXAMPLE
+
 * Documentation
   
    API Documentation for colors is located at:
