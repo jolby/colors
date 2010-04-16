@@ -11,15 +11,24 @@
 
 (ns
     #^{:doc
-       "Color manipulation routines. This is mostly a port of the
-color.rb module in the ruby SASS project to Clojure:
-http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
+       "Color manipulation routines. This code was heavily infuenced by the
+color.rb module in the ruby SASS project, and the colorspace packages in R.
+
 
 Further references:
-HSL and HSV: http://en.wikipedia.org/wiki/Luminance-Hue-Saturation
-RGB color space: http://en.wikipedia.org/wiki/RGB_color_space
+HSL and HSV:
+http://en.wikipedia.org/wiki/Luminance-Hue-Saturation
+RGB color space:
+http://en.wikipedia.org/wiki/RGB_color_space
 http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
 http://www.w3.org/TR/css3-color/#hsl-color
+
+SASS color module:
+http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
+
+R colorspace package:
+ttp://cran.r-project.org/web/packages/colorspace/index.html
+
 "
        :author "Joel Boehland"}
 
@@ -28,9 +37,7 @@ http://www.w3.org/TR/css3-color/#hsl-color
   (:use (clojure.contrib core except math str-utils seq-utils))
   (:require [com.evocomputing.colors.palettes.webcolors :as wc]))
 
-(declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
-         html4-colors-rgbnum-to-name html4-colors-rgb-to-name
-         rgb-int-to-components rgba-int-to-components
+(declare rgb-int-to-components rgba-int-to-components
          rgb-int-from-components rgba-int-from-components
          rgb-to-hsl hsl-to-rgb)
 
@@ -444,7 +451,6 @@ are within tolerance"
   (conj (rgb-int-to-components rgba-int)
         (bit-shift-right rgba-int 24)))
 
-;;Color ops
 (defmacro def-color-bin-op
   "Macro for creating binary operations between two colors.
 
@@ -480,8 +486,6 @@ color - a new color that is the result of the binary operation."
         rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
                                       (take 3 (:rgba color1)) (take 3 (:rgba color2))))
         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
-    ;;(println (format "p: %s, w: %s, a: %s, w1: %s, w2: %s, rgb: %s, adj-alpha: %s, rgba: %s"
-    ;;                 p w a w1 w2 rgb adj-alpha (conj rgb adj-alpha)))
     (create-color (conj rgb adj-alpha))))
 
 (defn adjust-hue [color degrees]
@@ -663,35 +667,6 @@ different parameters, providing suitable terrain colors."
             :s-start 80.0 :s-end 0.0
             :l-start 60.0 :l-end 95.0
             :power-saturation 0.10 :power-lightness 1.0))
-
-(def html4-colors-name-to-rgbnum
-     {
-      "black"    0x000000
-      "silver"   0xc0c0c0
-      "gray"     0x808080
-      "white"    0xffffff
-      "maroon"   0x800000
-      "red"      0xff0000
-      "purple"   0x800080
-      "fuchsia"  0xff00ff
-      "green"    0x008000
-      "lime"     0x00ff00
-      "olive"    0x808000
-      "yellow"   0xffff00
-      "navy"     0x000080
-      "blue"     0x0000ff
-      "teal"     0x008080
-      "aqua"     0x00ffff
-      })
-
-(def html4-colors-rgbnum-to-name
-     (into {} (map (fn [[k v]] [v k]) html4-colors-name-to-rgbnum)))
-
-(def html4-colors-name-to-rgb
-     (into {} (for [[k v] html4-colors-name-to-rgbnum] [k (rgb-int-to-components v)])))
-
-(def html4-colors-rgb-to-name
-     (into {} (map (fn [[k v]] [v k]) html4-colors-name-to-rgb)))
 
 (defn hue-to-rgb
   "Convert hue color to rgb components
