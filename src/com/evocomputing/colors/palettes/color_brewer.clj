@@ -60,6 +60,8 @@
    [clojure.contrib.duck-streams :as ds]))
 
 
+(declare color-brewer-palettes)
+
 (def divergent-labels ["BrBG" "PiYG" "PRGn" "PuOr" "RdBu" "RdGy" "RdYlBu" "RdYlGn" "Spectral"])
 (def qualitative-labels ["Accent" "Dark2" "Paired" "Pastel1" "Pastel2" "Set1" "Set2" "Set3"])
 (def sequential-labels ["Blues" "BuGn" "BuPu" "GnBu" "Greens" "Greys" "Oranges" "OrRd" "PuBu"
