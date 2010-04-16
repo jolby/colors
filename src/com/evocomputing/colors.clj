@@ -441,8 +441,10 @@ are within tolerance"
   rgb integer values"
   [rgb-int]
   (into []
-        (reverse (for [n (range 0 3)]
-                   (bit-and (bit-shift-right rgb-int (bit-shift-left n 3)) 0xff)))))
+        (reverse
+         (for [n (range 0 3)]
+           (bit-and
+            (bit-shift-right rgb-int (bit-shift-left n 3)) 0xff)))))
 
 (defn rgba-int-to-components
   "Convert a color given in numeric rgb format into a vector of the 4
