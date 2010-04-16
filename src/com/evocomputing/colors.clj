@@ -27,7 +27,7 @@ SASS color module:
 http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb
 
 R colorspace package:
-ttp://cran.r-project.org/web/packages/colorspace/index.html
+http://cran.r-project.org/web/packages/colorspace/index.html
 
 "
        :author "Joel Boehland"}
