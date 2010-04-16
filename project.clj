@@ -1,4 +1,4 @@
-(defproject org.evocomputing/colors
+(defproject com.evocomputing/colors
   "1.0.0-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."

@@ -108,7 +108,6 @@
        (filter #(and (= palette-label (% 0)) (= number (% 1)))
                color-brewer-palettes)))
 
-
 (def col-headers ["ColorName","NumOfColors","Type","CritVal",
                    "ColorNum","ColorLetter","R","G","B","SchemeType"])
 
