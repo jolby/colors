@@ -24,13 +24,6 @@
 (def col-headers ["ColorName","NumOfColors","Type","CritVal",
                    "ColorNum","ColorLetter","R","G","B","SchemeType"])
 
-(def sample-cb-lines
-     ["\"Accent\",3,\"qual\",,1,\"A\",127,201,127,\"Qualitative\""
-      ",,,,2,\"B\",190,174,212,"
-      "\"PuOr\",10,\"div\",5.5,1,\"A\",127,59,8,\"Divergent\""
-      ",,,,2,\"B\",179,88,6,"
-      ])
-
 (defn process-csv-line [header-line line]
   (let [[color-name num-colors type
          crit-val color-num color-letter
@@ -39,9 +32,6 @@
          nf (java.text.NumberFormat/getInstance)
          nums #(when-not (or (nil? %) (= "" %)) (.parse nf %))
          is-header (not (nil? (qs color-name)))
-         ;;(println (format "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-         ;;                 color-name num-colors type crit-val
-         ;;                 color-num color-letter r g b scheme-type ))
          cvals (vector (or (qs color-name) (header-line 0))
                        (or (nums num-colors) (header-line 1))
                        (or (qs type) (header-line 2))
@@ -50,12 +40,9 @@
                        (qs color-letter)
                        (nums r) (nums g) (nums b)
                        (or (qs scheme-type) (header-line 9)))]
-    ;;(println (format "color-name: %s" (qs color-name)))
-    ;;(println (format "is-header: %s" is-header))
     cvals))
 
-(defn read-colors-csv2 [path]
-  ;;(let [header-line (atom (into [] (repeat 10 nil)))]
+(defn read-colors-csv [path]
   (with-open [reader (java.io.BufferedReader. (java.io.FileReader. path))]
     (loop [colors []
            header-line (into [] (repeat 10 nil))]
@@ -65,28 +52,6 @@
           (let [cvals (process-csv-line header-line line)]
             (recur (conj colors cvals) (if (cvals 0) cvals header-line))))))))
 
-
-;;old, working version
-(defn read-colors-csv [path]
-  (for [line (ds/read-lines path)]
-    (let [[color-name num-colors type
-           crit-val color-num color-letter
-           r g b scheme-type] (su/re-split #"," line)
-           qs #(when-not (or (nil? %) (= "" %)) (.replace % "\"" ""))
-           nf (java.text.NumberFormat/getInstance)
-           nums #(when-not (or (nil? %) (= "" %)) (.parse nf %))]
-      ;;(print (format "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-      ;;               color-name num-colors type crit-val
-      ;;               color-num color-letter r g b scheme-type ))
-      (vector (qs color-name)
-              (nums num-colors)
-              (qs type)
-              (nums crit-val)
-              (nums color-num)
-              (qs color-letter)
-              (nums r) (nums g) (nums b)
-              (qs scheme-type))
-      )))
 
 
 (def color-brewer-palettes
