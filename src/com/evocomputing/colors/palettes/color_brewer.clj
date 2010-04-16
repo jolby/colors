@@ -1,5 +1,5 @@
 ;; by Joel Boehland http://github.com/jolby/colors
-;; February 26, 2010
+;; April 16, 2010
 
 ;; Copyright (c) Joel Boehland, 2010. All rights reserved.  The use
 ;; and distribution terms for this software are covered by the Eclipse
@@ -8,6 +8,50 @@
 ;; distribution.  By using this software in any fashion, you are
 ;; agreeing to be bound by the terms of this license.  You must not
 ;; remove this notice, or any other, from this software.
+
+
+;; ================================================================================
+;; Usage of colorbrewer schemes covered under an Apache licence:
+;; Apache-Style Software License for ColorBrewer software and ColorBrewer Color Schemes, Version 1.1
+
+;; Copyright (c) 2002 Cynthia Brewer, Mark Harrower, and The
+;; Pennsylvania State University. All rights reserved.
+
+;; Redistribution and use in source and binary forms, with or without
+;; modification, are permitted provided that the following conditions
+;; are met:
+
+;;    1. Redistributions as source code must retain the above
+;;    copyright notice, this list of conditions and the following
+;;    disclaimer.  2. The end-user documentation included with the
+;;    redistribution, if any, must include the following
+;;    acknowledgment:
+
+;;       This product includes color specifications and designs
+;;       developed by Cynthia Brewer (http://colorbrewer.org/).
+
+;;       Alternately, this acknowledgment may appear in the software
+;;    itself, if and wherever such third-party acknowledgments
+;;    normally appear.  3. The name "ColorBrewer" must not be used to
+;;    endorse or promote products derived from this software without
+;;    prior written permission. For written permission, please contact
+;;    Cynthia Brewer at cbrewer@psu.edu.  4. Products derived from
+;;    this software may not be called "ColorBrewer", nor may
+;;    "ColorBrewer" appear in their name, without prior written
+;;    permission of Cynthia Brewer.
+
+;; THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESSED OR IMPLIED
+;; WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+;; OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+;; DISCLAIMED. IN NO EVENT SHALL CYNTHIA BREWER, MARK HARROWER, OR THE
+;; PENNSYLVANIA STATE UNIVERSITY BE LIABLE FOR ANY DIRECT, INDIRECT,
+;; INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+;; HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+;; STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns com.evocomputing.colors.palettes.color-brewer
   (:use [com.evocomputing.colors :only (create-color)])
@@ -20,10 +64,6 @@
 (def qualitative-labels ["Accent" "Dark2" "Paired" "Pastel1" "Pastel2" "Set1" "Set2" "Set3"])
 (def sequential-labels ["Blues" "BuGn" "BuPu" "GnBu" "Greens" "Greys" "Oranges" "OrRd" "PuBu"
                         "PuBuGn" "PuRd" "Purples" "RdPu" "Reds" "YlGn" "YlGnBu" "YlOrBr" "YlOrRd"])
-
-
-(def col-headers ["ColorName","NumOfColors","Type","CritVal",
-                   "ColorNum","ColorLetter","R","G","B","SchemeType"])
 
 (defn process-csv-line [header-line line]
   (let [[color-name num-colors type
@@ -65,6 +105,10 @@
   (map #'rec-to-color
        (filter #(and (= palette-label (% 0)) (= number (% 1)))
                color-brewer-palettes)))
+
+
+(def col-headers ["ColorName","NumOfColors","Type","CritVal",
+                   "ColorNum","ColorLetter","R","G","B","SchemeType"])
 
 (def color-brewer-palettes
 [["Accent" 3 "qual" nil 1 "A" 127 201 127 "Qualitative"]
