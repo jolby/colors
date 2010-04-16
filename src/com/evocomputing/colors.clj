@@ -25,7 +25,8 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core except math str-utils seq-utils)))
+  (:use (clojure.contrib core except math str-utils seq-utils))
+  (:require [com.evocomputing.colors.palettes.webcolors :as wc]))
 
 (declare html4-colors-name-to-rgbnum html4-colors-name-to-rgb
          html4-colors-rgbnum-to-name html4-colors-rgb-to-name
@@ -53,6 +54,11 @@ http://www.w3.org/TR/css3-color/#hsl-color
 
 (def allowable-hsl-keys
      #{:h :hue :s :saturation :l :lightness})
+
+;;These are the default named colors, feel free to create your own
+;;named-colors palettes
+(def named-colors-name-to-rgb (merge wc/html4-name-to-rgb wc/x11-name-to-rgb))
+(def named-colors-rgb-to-name (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
 
 (defn hexstring-to-rgba-int
   [hexstr]
@@ -244,10 +250,11 @@ This multimethod is very liberal in what it will accept to create a
 color. Following is a list of acceptable formats:
 
 Single Arg
-- Symbolic: Either a string or keyword or symbol that
-matches an entry in the symbolic color pallette. Currently, this is
-the html4 colors map, but there are plans to allow the symbolic color
-map to be set to any custom pallette.
+- Symbolic: Either a string or keyword or symbol that matches an entry
+in the symbolic color pallete. Currently, this is defaults to the
+html4 colors map and x11 colors map, but the end user of this library
+can set any named palette they want.
+
   examples:
   (create-color \"blue\")
   (create-color :blue)
@@ -301,10 +308,10 @@ Multiple Arg
   (letfn [(stringify [colorsym]
              (if (or (symbol? colorsym) (keyword? colorsym))
                (.toLowerCase (name colorsym))
-               colorsym))]
+               (.toLowerCase colorsym)))]
     (let [colorsym (stringify colorsym)]
-      (if-let [rgb-int (html4-colors-name-to-rgbnum colorsym)]
-        (create-color (rgb-int-to-components rgb-int))
+      (if-let [rgb (named-colors-name-to-rgb colorsym)]
+        (create-color rgb)
         (create-color
          (rgba-int-to-components (hexstring-to-rgba-int colorsym)))))))
 
@@ -356,11 +363,6 @@ Multiple Arg
 (defn alpha "Return the alpha (int) component of this color" [color] ((:rgba color) 3))
 
 
-(defn awt-color
-  "Return a java.awt.Color object using this color's rgba components"
-  [color]
-  (Color. (rgba-int color) true))
-
 (defn rgb-int
   "Return a integer (RGB) representation of this color"
   [color]
@@ -386,9 +388,14 @@ Multiple Arg
 names map, return that. Otherwise, return the hexcode string of this
 color's rgba integer value"
   [color]
-  (if-let [color-name (html4-colors-rgbnum-to-name (rgb-int color))]
+  (if-let [color-name (named-colors-rgb-to-name (take 3 (:rgba color)))]
     color-name
     (format "%#08x" (rgba-int color))))
+
+(defn awt-color
+  "Return a java.awt.Color object using this color's rgba components"
+  [color]
+  (Color. (rgba-int color) true))
 
 (defmethod print-method ::color [color writer]
   (print-method (format "#<color: %s R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
@@ -517,21 +524,22 @@ color - a new color that is the result of the binary operation."
 (defn opposite [color]
   (adjust-hue color 180))
 
-
 (defn inclusive-seq [n start end]
   "Return n evenly spaced points along the range start - end (inclusive)"
   (when (< n 1) (throw-arg "n must be 1 or greater"))
-  (if (= n 1) start
-      (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
-            (if (= idx n) acc
-                (recur (conj acc num) step (+ step num) (inc idx))))))
+  (condp = n
+    1 [start]
+    2 [start end]
+    (conj (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
+            (if (= idx (dec n)) acc
+                (recur (conj acc num) step (+ step num) (inc idx)))) end)))
 
 (defn rainbow-hsl
   "Computes a rainbow of colors (qualitative palette) defined by
 different hues given a single value of each saturation and lightness.
 
 Arguments:
-numcolors: Number of colors to be produced in this pallette.
+numcolors: Number of colors to be produced in this palette.
 
 Optional Arguments:
 :s (keyword) saturation. 0.0 - 100.0 (default 50.0)
@@ -543,9 +551,7 @@ Optional Arguments:
   [numcolors & opts]
   (let [opts (merge {:s 50.0 :l 70.0 :start 0 :end (* 360 (/ (- numcolors 1) numcolors))}
                     (when opts (apply assoc {} opts)))
-        ;;hvals (range (:start opts) (inc (:end opts)) (/ (:end opts) (dec numcolors)))
         hvals (inclusive-seq numcolors (:start opts) (:end opts))]
-    (printf (format "hvals: %s" (vec hvals)))
     (map #(create-color :h (float %) :s (:s opts) :l (:l opts))
          hvals)))
 
@@ -559,7 +565,7 @@ an interpolation between the full color hsl1,
 a neutral color hsl and the other full color hsl2.
 
 Arguments:
-numcolors: Number of colors to be produced in this pallette.
+numcolors: Number of colors to be produced in this palette.
 
 Optional Arguments:
 :h-start (keyword) starting hue (default 260)
@@ -590,7 +596,7 @@ be increased (1 = linear, 2 = quadratic, etc.) (default 1.5)
 interpolation.
 
 Arguments:
-numcolors: Number of colors to be produced in this pallette.
+numcolors: Number of colors to be produced in this palette.
 
 Optional Arguments:
 :h (keyword) starting hue (default 260)
@@ -615,13 +621,13 @@ be increased (1 = linear, 2 = quadratic, etc.)
          (inclusive-seq numcolors 1.0 0.0))))
 
 (defn heat-hsl
-  " Create heat pallette in HSL space. By default, it goes from a red to a yellow hue, while
+  " Create heat palette in HSL space. By default, it goes from a red to a yellow hue, while
 simultaneously going to lighter colors (i.e., increasing
 lightness) and reducing the amount of color (i.e., decreasing
 saturation).
 
 Arguments:
-numcolors: Number of colors to be produced in this pallette.
+numcolors: Number of colors to be produced in this palette.
 
 Optional Arguments:
 :h-start (keyword) starting hue (default 260)
@@ -637,9 +643,9 @@ be increased (1 = linear, 2 = quadratic, etc.)
 
   [numcolors & opts]
   (let [opts (merge {:h-start 0 :h-end 90
-                     :s-start 80.0 :l-start 30.0
-                     :s-end 0.0 :l-end 90.0
-                     :power-saturation 0.20 :power-lightness 1}
+                     :s-start 100.0 :s-end 30.0
+                     :l-start 50.0 :l-end 90.0
+                     :power-saturation 0.20 :power-lightness 1.0}
                     (when opts (apply assoc {} opts)))
         diff-h (- (:h-end opts) (:h-start opts))
         diff-s (- (:s-end opts) (:s-start opts))
@@ -653,9 +659,10 @@ be increased (1 = linear, 2 = quadratic, etc.)
   "The 'terrain_hcl' palette simply calls 'heat_hcl' with
 different parameters, providing suitable terrain colors."
   [numcolors & opts]
-  (heat-hsl numcolors :h-start 0 :h-end 90
-            :s-start 100.0 :s-end 30.0
-            :l-start 50.0 :l-end 90.0))
+  (heat-hsl numcolors :h-start 130 :h-end 0
+            :s-start 80.0 :s-end 0.0
+            :l-start 60.0 :l-end 95.0
+            :power-saturation 0.10 :power-lightness 1.0))
 
 (def html4-colors-name-to-rgbnum
      {
