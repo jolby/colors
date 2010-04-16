@@ -10,6 +10,7 @@
 ;; remove this notice, or any other, from this software.
 
 (ns com.evocomputing.colors.palettes.color-brewer
+  (:use [com.evocomputing.colors :only (create-color)])
   (:require
    [clojure.contrib.str-utils :as su]
    [clojure.contrib.duck-streams :as ds]))
@@ -53,6 +54,17 @@
             (recur (conj colors cvals) (if (cvals 0) cvals header-line))))))))
 
 
+(defn rec-to-color
+  "Create a color object from a color brewer record"
+  [rec]
+  (create-color :r (rec 6) :g (rec 7) :b (rec 8)))
+
+(defn get-color-brewer-palette
+  "Get the colors associated with the provided palette and number"
+  [palette-label number]
+  (map #'rec-to-color
+       (filter #(and (= palette-label (% 0)) (= number (% 1)))
+               color-brewer-palettes)))
 
 (def color-brewer-palettes
 [["Accent" 3 "qual" nil 1 "A" 127 201 127 "Qualitative"]
