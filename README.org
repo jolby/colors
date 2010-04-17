@@ -1,9 +1,6 @@
 * About
   Colors provides color manipulation routines to
-  Clojure. Currently,this is mostly a port of the color.rb module in
-  the ruby SASS project to Clojure:
- 
-  [[http://github.com/nex3/haml/blob/master/lib/sass/script/color.rb]]
+  Clojure. 
 
   Further references:
   - HSL and HSV:
