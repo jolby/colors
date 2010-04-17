@@ -69,6 +69,32 @@
 
 #+END_EXAMPLE
 
+** Convert and manipulate colors
+   You can easily convert color objects into java.awt.Color objects,
+or a packed 32 bit integer representation, or its component R, G, B,
+A or H, S, L, A parts.
+
+#+BEGIN_EXAMPLE 
+(use 'com.evocomputing.colors)
+
+(def red-color (create-color :red))
+;;Convert to java.awt.Color
+(awt-color red-color)
+
+;;get the rgba integer representation
+(rgba-int red-color)
+
+;;get the hexstring representation
+(rgb-hexstr red-color)
+
+;;get a vector of the constituent rgba components
+(:rgba red-color)
+
+;;likewise for the HSL constituent components
+(:hsl red-color)
+#+END_EXAMPLE
+
+
 ** Color Palettes
    You can use the com.evocomputing.colors.palettes package to easily
    create semantic color palettes. The functions in
