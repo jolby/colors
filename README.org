@@ -29,7 +29,7 @@
 ** Create Color Objects
    The first point of entry is to create a color object. This package
    takes a wide range of representations to be passed to the
-   create-color multi function
+   create-color multimethod
 #+BEGIN_EXAMPLE 
 (use 'com.evocomputing.colors)
 
