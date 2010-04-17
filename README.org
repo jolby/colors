@@ -51,8 +51,8 @@
 (create-color "Ox80FFFF00") ;; alpha = 128
 
 ;; Integer: An integer representation of an RGB(A) color
-;;(create-color 0xFFCCAA) ;; integer in hexidecimal format
-;;(create-color 16764074) ;; same integer in decimal format
+(create-color 0xFFCCAA) ;; integer in hexidecimal format
+(create-color 16764074) ;; same integer in decimal format
 
 ;;Sequence or array of RGB(A) integers
 (create-color [255 0 0])
@@ -67,6 +67,39 @@
 (create-color {:h 120.0 :s 100.0 :l 50.0})
 (create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
 
+#+END_EXAMPLE
+
+** Color Palettes
+   You can use the com.evocomputing.colors.palettes package to easily
+   create semantic color palettes. The functions in
+   com.evocomputing.colors.palettes.core follow the functions in the R
+   colorspaces package.
+   http://cran.r-project.org/web/packages/colorspace/index.html
+
+#+BEGIN_EXAMPLE 
+(use 'com.evocomputing.colors)
+(use 'com.evocomputing.colors.palettes.core)
+(use 'com.evocomputing.colors.palettes.color-brewer)
+
+;;Create a rainbow qualitative palette of 10 colors
+;;each with different hues given a single value of each
+;;saturation and lightness
+(rainbow-hsl 10)
+
+;;Create a diverging palette of 10 colors, composed of a set of colors
+;;diverging from a neutral center (grey or white, without color) to two
+;;different extreme colors (blue and red by default).
+(diverge-hsl 10)
+
+;;Create heat palette in HSL space. By default, it goes from a red to
+;;a yellow hue, while simultaneously going to lighter colors (i.e.,
+;;increasing lightness) and reducing the amount of color (i.e.,
+;;decreasing saturation).
+(heat-hsl 10)
+
+;;Create an 8 item ColorBrewer sequential palette "YlOrRd" (Yellow,
+;;Orange, Red)
+(get-color-brewer-palette "YlOrRd" 8)
 #+END_EXAMPLE
 
 * Documentation
