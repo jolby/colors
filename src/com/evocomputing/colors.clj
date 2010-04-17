@@ -496,12 +496,12 @@ color - a new color that is the result of the binary operation."
                 :s (saturation color)
                 :l (lightness color) :a (alpha color)))
 
-(defn saturate [percent]
+(defn saturate [color percent]
   (create-color :h (hue color)
                 :s (clamp-percent-float (+ (saturation color) percent))
                 :l (lightness color) :a (alpha color)))
 
-(defn desaturate [percent]
+(defn desaturate [color percent]
   (create-color :h (hue color)
                 :s (clamp-percent-float (- (saturation color) percent))
                 :l (lightness color) :a (alpha color)))

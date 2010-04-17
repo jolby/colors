@@ -69,7 +69,7 @@
 
 #+END_EXAMPLE
 
-** Convert and manipulate colors
+** Convert colors
    You can easily convert color objects into java.awt.Color objects,
 or a packed 32 bit integer representation, or its component R, G, B,
 A or H, S, L, A parts.
@@ -94,6 +94,28 @@ A or H, S, L, A parts.
 (:hsl red-color)
 #+END_EXAMPLE
 
+** Manipulate colors
+   You can easily manipulate and adjust colors with simple operations
+#+BEGIN_EXAMPLE 
+(use 'com.evocomputing.colors)
+
+(def blue-color (create-color :blue))
+;; => "#<color: blue R: 0, G: 0, B: 255, H: 240.00, S: 100.00, L:#50.00, A: 255>"
+
+;;Create new color 1/3 way around color wheel
+;;to get new primary red color
+(adjust-hue blue-color 120)
+;; => "#<color: red R: 255, G: 0, B: 0, H: 0.00, S: 100.00, L: 50.00, A: 255>"
+
+;;lighten by 20%
+(lighten blue-color 20)
+;; => "#<color: 0xff6666ff R: 102, G: 102, B: 255, H: 240.00, S: 100.00, L: 70.00, A: 255>"
+
+;;darken by 20%
+(darken blue-color 20)
+;; => "#<color: 0xff000099 R: 0, G: 0, B: 153, H: 240.00, S: 100.00,#L: 30.00, A: 255>"
+
+#+END_EXAMPLE
 
 ** Color Palettes
    You can use the com.evocomputing.colors.palettes package to easily
