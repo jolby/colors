@@ -56,8 +56,7 @@
 (ns com.evocomputing.colors.palettes.color-brewer
   (:use [com.evocomputing.colors :only (create-color)])
   (:require
-   [clojure.contrib.str-utils :as su]
-   [clojure.contrib.duck-streams :as ds]))
+   [clojure.core.string :as s]))
 
 
 (declare color-brewer-palettes)
@@ -70,7 +69,7 @@
 (defn process-csv-line [header-line line]
   (let [[color-name num-colors type
          crit-val color-num color-letter
-         r g b scheme-type] (su/re-split #"," line)
+         r g b scheme-type] (s/split line #",")
          qs #(when-not (or (nil? %) (= "" %)) (.replace % "\"" ""))
          nf (java.text.NumberFormat/getInstance)
          nums #(when-not (or (nil? %) (= "" %)) (.parse nf %))

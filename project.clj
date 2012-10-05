@@ -1,12 +1,10 @@
 (defproject com.evocomputing/colors
-  "1.0.0-SNAPSHOT"
+  "1.0.1-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
-  :dependencies [[org.clojure/clojure "1.1.0"]
-                 [org.clojure/clojure-contrib "1.0-SNAPSHOT"]]
-  :dev-dependencies [[swank-clojure "1.1.0"]
-                     [autodoc "0.7.0"]
-                     [lein-clojars "0.5.0-SNAPSHOT"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]
+                 [org.clojure/math.numeric-tower "0.0.1"]
+                 [org.clojure/core.incubator "0.1.2"]]
 
   :autodoc { :name "colors"
             :description "Color and colorspace calculation, manipulation and conversion in Clojure."

@@ -10,7 +10,7 @@
 ;; remove this notice, or any other, from this software.
 
 (ns
-    #^{:doc
+    ^{:doc
        "Color manipulation routines. This code was heavily infuenced by the
 color.rb module in the ruby SASS project, and the colorspace packages in R.
 
@@ -34,7 +34,8 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
   com.evocomputing.colors
   (import (java.awt Color))
-  (:use (clojure.contrib core except math str-utils seq-utils))
+  (:use [clojure.math.numeric-tower :only [abs round]]
+        [clojure.core.incubator :only [seqable?]])
   (:require [com.evocomputing.colors.palettes.webcolors :as wc]))
 
 (declare rgb-int-to-components rgba-int-to-components
@@ -42,7 +43,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
          rgb-to-hsl hsl-to-rgb)
 
 (defstruct
-    #^{:doc
+    ^{:doc
        "Structure representing a color. Default representation
     is an array of integers mapping to the respective RGB(A)
     values. This structure also supports holding an array of float
@@ -67,6 +68,13 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 (def named-colors-name-to-rgb (merge wc/html4-name-to-rgb wc/x11-name-to-rgb))
 (def named-colors-rgb-to-name (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
 
+(defn throw-if-not
+  "Throws an Exception or Error if test is false. args are those documented
+  for throwf."
+  [test & args]
+  (when-not test
+    (throw (Exception. args))))
+
 (defn hexstring-to-rgba-int
   [hexstr]
   (if-let [matches (re-find #"(^#|^0[Xx])([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" hexstr)]
@@ -78,11 +86,11 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
 ;;Resolution/normalize code taken from Ruby color:
 ;;http://rubyforge.org/projects/color
-(def #^{:doc "The maximum resolution for colour math; if any value is less than or
+(def ^{:doc "The maximum resolution for colour math; if any value is less than or
    equal to this value, it is treated as zero."}
      color-epsilon 0.00001)
 
-(def #^{:doc "The tolerance for comparing the components of two colours. In general,
+(def ^{:doc "The tolerance for comparing the components of two colours. In general,
   colours are considered equal if all of their components are within this
   tolerance value of each other."}
  color-tolerance 0.0001)

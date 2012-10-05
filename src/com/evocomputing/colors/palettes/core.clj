@@ -10,16 +10,12 @@
 ;; remove this notice, or any other, from this software.
 
 (ns com.evocomputing.colors.palettes.core
-  (:use [clojure.contrib.except :only (throw-arg)]
-        [com.evocomputing.colors :only (create-color)])
-  (:require
-   [clojure.contrib.str-utils :as su]
-   [clojure.contrib.duck-streams :as ds]))
+  (:use [com.evocomputing.colors :only (create-color)]))
 
 
 (defn inclusive-seq [n start end]
   "Return n evenly spaced points along the range start - end (inclusive)"
-  (when (< n 1) (throw-arg "n must be 1 or greater"))
+  (assert (< n 1)
   (condp = n
     1 [start]
     2 [start end]

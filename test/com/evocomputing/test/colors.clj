@@ -13,8 +13,8 @@
 (ns com.evocomputing.test.colors
   (import (java.awt Color))
   (:use (clojure test))
-  (:use (clojure.contrib str-utils seq-utils except))
-  (:use (com.evocomputing colors)))
+  (:use (com.evocomputing colors))
+  (:require [clojure.string :as s]))
 
 (deftest test-hsl-to-rgb
   (is (= [255 0 0] (hsl-to-rgb 360.0,100.0,50.0)))
@@ -71,11 +71,11 @@
 
 (defn hsl-rgb-test-pairs []
   (let [filestr (slurp (.getPath (.getResource (clojure.lang.RT/baseLoader) "hsl-rgb.txt")))
-        chunks (re-split #"\n\n" filestr)
-        clean-fn (fn [lines] (filter #(not= "" %) (map #(.trim %) (re-split #"\n" lines))))]
+        chunks (s/split filestr #"\n\n")
+        clean-fn (fn [lines] (filter #(not= "" %) (map #(.trim %) (s/split lines #"\n"))))]
     (partition 2 (flatten
                   (for [chunk chunks]
-                    (let [[hsls rgbs] (re-split #"====" chunk)]
+                    (let [[hsls rgbs] (s/split chunk #"====")]
                       (interleave (clean-fn hsls)
                                   (clean-fn rgbs))))))))
 

@@ -9,10 +9,7 @@
 ;; agreeing to be bound by the terms of this license.  You must not
 ;; remove this notice, or any other, from this software.
 
-(ns com.evocomputing.colors.palettes.webcolors
-  (:require
-   [clojure.contrib.str-utils :as su]
-   [clojure.contrib.duck-streams :as ds]))
+(ns com.evocomputing.colors.palettes.webcolors)
 
 
 (def x11-pattern (re-pattern #"\s*(\d+)\s+(\d+)\s+(\d+)\s+(.*)"))
