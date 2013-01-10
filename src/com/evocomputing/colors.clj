@@ -73,7 +73,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   for throwf."
   [test & args]
   (when-not test
-    (throw (Exception. args))))
+    (throw (Exception. (apply format args)))))
 
 (defn hexstring-to-rgba-int
   [hexstr]
