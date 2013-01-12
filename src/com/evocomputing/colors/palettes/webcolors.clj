@@ -19,11 +19,11 @@
     (let [r (Integer/parseInt (match 1))
           g (Integer/parseInt (match 2))
           b (Integer/parseInt (match 3))
-          name (.toLowerCase (.replace (match 4) " " ""))]
+          name (.toLowerCase (.replace ^java.lang.String (match 4) " " ""))]
       [[r g b] name])))
 
 (defn read-x11-colors [path]
-  (with-open [reader (java.io.BufferedReader. (java.io.FileReader. path))]
+  (with-open [reader (java.io.BufferedReader. (java.io.FileReader. ^java.lang.String path))]
     (loop [colors []
            seen-colors #{}]
       (let [line (.readLine reader)]

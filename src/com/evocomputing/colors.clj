@@ -73,7 +73,8 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   for throwf."
   [test & args]
   (when-not test
-    (throw (Exception. (apply format args)))))
+    (let [message (apply format args)]
+      (throw (Exception. ^java.lang.String message )))))
 
 (defn hexstring-to-rgba-int
   [hexstr]
@@ -319,11 +320,11 @@ Multiple Arg
 
   create-color-dispatch)
 
-(defmethod create-color ::symbolic-color [colorsym]
+(defmethod create-color ::symbolic-color [^java.lang.String colorsym]
   (letfn [(stringify [colorsym]
              (if (or (symbol? colorsym) (keyword? colorsym))
                (.toLowerCase (name colorsym))
-               (.toLowerCase colorsym)))]
+               (.toLowerCase ^java.lang.String colorsym)))]
     (let [colorsym (stringify colorsym)]
       (if-let [rgb (named-colors-name-to-rgb colorsym)]
         (create-color rgb)
@@ -365,7 +366,7 @@ Multiple Arg
         rgba (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
     (create-color-with-meta (struct color rgba hsl))))
 
-(defmethod create-color Color [color]
+(defmethod create-color Color [^java.awt.Color color]
   (create-color [(.getRed color) (.getGreen color)
                  (.getBlue color) (.getAlpha color)]))
 
@@ -490,7 +491,7 @@ color - a new color that is the result of the binary operation."
         w (- (* p 2) 1)
         a (- (alpha color1) (alpha color2))
         w1 (/ (+ 1
-                 (if (= (* w a) -1) w
+                 (if (= (* w a) -1.0) w
                      (/ (+ w a) (+ 1 (* w a)))))
               2.0)
         w2 (- 1 w1)
