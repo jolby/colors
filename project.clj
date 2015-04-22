@@ -2,6 +2,8 @@
   "1.0.2-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
+  :url "http://jolby.github.com/colors/"
+  :license "Eclipse Public License (EPL)"
   :dependencies [[org.clojure/clojure "1.7.0-beta1"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/core.incubator "0.1.3"]]
