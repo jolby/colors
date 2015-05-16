@@ -2,9 +2,9 @@
   "1.0.1-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [org.clojure/math.numeric-tower "0.0.1"]
-                 [org.clojure/core.incubator "0.1.2"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [org.clojure/math.numeric-tower "0.0.3"]
+                 [org.clojure/core.incubator "0.1.3"]]
 
   :autodoc { :name "colors"
             :description "Color and colorspace calculation, manipulation and conversion in Clojure."
