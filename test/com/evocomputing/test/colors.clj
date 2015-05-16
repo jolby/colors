@@ -69,6 +69,15 @@
   )
 
 
+;; Make sure that creating a color from RGB values leads to legal
+;; saturation and lightness levels. These test values were
+;; formerly causing exceptions by yielding saturation or lightness
+;; values slightly greater than 100.0.
+(deftest test-rgb-color-creation
+  (adjust-hue (create-color :r 10 :g 255 :b 43) 40)
+  (adjust-hue (create-color :r 115 :g 255 :b 218) 40)
+  (adjust-hue (create-color :r 250 :g 255 :b 121) 40))
+
 (defn hsl-rgb-test-pairs []
   (let [filestr (slurp (.getPath (.getResource (clojure.lang.RT/baseLoader) "hsl-rgb.txt")))
         chunks (s/split filestr #"\n\n")
@@ -105,3 +114,4 @@
                         "Saturations should be equal")
           (throw-if-not (within-tolerance? (lightness hsl-color) (lightness rgb-color))
                         "Lightnesses should be equal")))))
+
