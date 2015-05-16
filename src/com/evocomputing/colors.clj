@@ -601,4 +601,4 @@ http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL
             (= max min) 0.0
             (< l 0.5) (/ delta (* 2 l))
             :else (/ delta (- 2 (* 2 l))))]
-        [(mod h 360.0) (* 100.0 s) (* 100.0 l)]))
+        [(mod h 360.0) (clamp-percent-float (* 100.0 s)) (clamp-percent-float (* 100.0 l))]))
