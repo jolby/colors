@@ -58,25 +58,34 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   :hsl)
 
 (def allowable-rgb-keys
-     #{:r :red :g :green :b :blue})
+  "The keyword arguments which may be used to create an RGB color."
+  #{:r :red :g :green :b :blue})
 
 (def allowable-hsl-keys
-     #{:h :hue :s :saturation :l :lightness})
+  "The keyword arguments which may be used to create an HSL color."
+  #{:h :hue :s :saturation :l :lightness})
 
 ;;These are the default named colors, feel free to create your own
 ;;named-colors palettes
-(def named-colors-name-to-rgb (merge wc/html4-name-to-rgb wc/x11-name-to-rgb))
-(def named-colors-rgb-to-name (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
+(def named-colors-name-to-rgb
+  "Maps the known color names to their RGB values."
+  (merge wc/html4-name-to-rgb wc/x11-name-to-rgb))
+
+(def named-colors-rgb-to-name
+  "Maps the nown color RGB values to their names."
+  (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
 
 (defn throw-if-not
-  "Throws an Exception or Error if test is false. args are those documented
-  for throwf."
+  "Throws an Exception if test is false. Arguments are those
+  documented for throwf."
   [test & args]
   (when-not test
     (let [message (apply format args)]
       (throw (Exception. ^java.lang.String message )))))
 
 (defn hexstring-to-rgba-int
+  "Convert a hexadecimal string to the corresponding array of RGBA
+  integer values."
   [hexstr]
   (if-let [matches (re-find #"(^#|^0[Xx])([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" hexstr)]
     (Long/decode
@@ -87,16 +96,19 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
 ;;Resolution/normalize code taken from Ruby color:
 ;;http://rubyforge.org/projects/color
-(def ^{:doc "The maximum resolution for colour math; if any value is less than or
-   equal to this value, it is treated as zero."}
-     color-epsilon 0.00001)
+(def color-epsilon
+  "The maximum resolution for color math; if any value is less than or
+  equal to this value, it is treated as zero."
+  0.00001)
 
-(def ^{:doc "The tolerance for comparing the components of two colours. In general,
-  colours are considered equal if all of their components are within this
-  tolerance value of each other."}
- color-tolerance 0.0001)
+(def color-tolerance
+  "The tolerance for comparing the components of two colors. In general,
+  colors are considered equal if all of their components are within this
+  tolerance value of each other."
+  0.0001)
 
 (defn within-tolerance?
+  "Check whether the two values are close enough to be considered the same."
   [fval1 fval2]
   (<= (abs (- fval1 fval2)) color-tolerance))
 
@@ -106,71 +118,75 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   (<= (abs fval) color-epsilon))
 
 (defn near-zero-or-less?
-  "Returns true if the fvalue is within color-epsilon of zero or less than zero."
+  "Returns true if the fvalue is within color-epsilon of zero or less
+  than zero."
   [fval]
   (or (< fval 0.0) (near-zero? fval)))
 
 (defn near-one?
-  "Returns true if fvalue is within color-epsilon of one"
+  "Returns true if fvalue is within color-epsilon of one."
   [fval]
   (near-zero? (- 1.0 fval)))
 
 (defn rgb-int?
   "If the passed in value is an integer in the range 0 - 255
-  inclusive, return true, otherwise return false"
+  inclusive, return true, otherwise return false."
   [rgb-int]
   (and (integer? rgb-int) (and (>= rgb-int 0) (<= rgb-int 255))))
 
 (defn unit-float?
-  "Return true if passed in float is in the range 0.0 - 1.0. False otherwise"
+  "Return true if passed in float is in the range 0.0 - 1.0, false otherwise."
   [fval]
   (and (>= fval 0.0) (<= fval 1.0)))
 
 (defn percent-float?
-  "Return true if passed in float is in the range 0.0 - 100.0. False otherwise"
+  "Return true if passed in float is in the range 0.0 - 100.0, false otherwise."
   [fval]
   (and (>= fval 0.0) (<= fval 100.0)))
 
 (defn circle-float?
-  "Return true if passed in float is in the range 0.0 - 360.0. False otherwise"
+  "Return true if passed in float is in the range 0.0 - 360.0, false otherwise."
   [fval]
   (and (>= fval 0.0) (<= fval 360.0)))
 
 (defn clamp-rgb-int
-  "Clamp the integer value to be within the range 0 - 255"
+  "Clamp the integer value to be within the range 0 - 255, the legal
+  values for an RGB color component."
   [rgb-int]
   (max (min rgb-int 255) 0))
 
 (defn clamp-unit-float
+  "Clamp the floating point value to be within the range 0 - 1.0."
   [ufloat]
   (max (min ufloat 1.0) 0.0))
 
 (defn clamp-percent-float
+  "Clamp the floating point value to be within the range 0 - 100.0."
   [pfloat]
   (max (min pfloat 100.0) 0.0))
 
 (defn clamp-hue
-  "Clamp the hue value so that is lies on the range 0.0 - 360.0"
+  "Clamp the hue value so that it lies in the range 0.0 - 360.0."
   [hue]
   (mod hue 360.0))
 
 (defn unit-float-to-rgba-int
   "Check that the passed in float is in the range 0.0 - 1.0, then
-convert it to the appropriate integer in the range 0 - 255"
+convert it to the appropriate integer in the range 0 - 255."
   [fval]
   (throw-if-not (unit-float? fval)
                 "fval must be a float between 0.0 and 0.1: %s" fval)
   (int (+ 0.5 (* fval 255))))
 
 (defn rgb-int-to-unit-float
- "Convert the integer in range 0 - 255 to float in range 0.0 - 1.0"
+ "Convert the integer in range 0 - 255 to float in range 0.0 - 1.0."
  [rgb-int]
  (throw-if-not (rgb-int? rgb-int) "Must be integer in range 0 - 255")
  (/ rgb-int 255.0))
 
 (defn maybe-convert-alpha
   "If alpha is a float value, try to convert to integer in range 0 -
-255, otherwise return as-is"
+  255, otherwise return as-is."
   [alpha]
   (if (rgb-int? alpha) alpha
       (do
@@ -180,7 +196,7 @@ convert it to the appropriate integer in the range 0 - 255"
 
 (defn check-rgb
   "Check that every element in the passed in rgba sequence is an
-integer in the range 0 - 255"
+  integer in the range 0 - 255."
   ([rgb]
      (throw-if-not (and (= (count rgb) 3) (every? #'rgb-int? rgb))
                    "Must contain 3 integers in range 0 - 255: %s" rgb)
@@ -191,7 +207,7 @@ integer in the range 0 - 255"
 
 (defn check-rgba
   "Check that every element in the passed in rgba sequence is an
-integer in the range 0 - 255"
+  integer in the range 0 - 255."
   ([rgba]
      (throw-if-not (and (= (count rgba) 4) (every? #'rgb-int? rgba))
                    "Must contain 4 integers in range 0 - 255: %s" rgba)
@@ -202,10 +218,9 @@ integer in the range 0 - 255"
 
 (defn check-hsl
   "Check that every element is of the format:
-- 1st, H (Hue): Float value in the range of: 0.0 - 360.0
-- 2nd, S (Saturation): Float value in the range: 0.0 - 100.0
-- 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0
-"
+  - 1st, H (Hue): Float value in the range of: 0.0 - 360.0.
+  - 2nd, S (Saturation): Float value in the range: 0.0 - 100.0.
+  - 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0."
   ([hsl]
      (throw-if-not (and (= (count hsl) 3) (not (some nil? hsl)))
                    "Must contain 3 floats representing HSL: %s" hsl)
@@ -221,7 +236,8 @@ L (Lightness or Luminance): Float value in the range 0.0 - 100.0
 
 
 (defn create-color-dispatch
-  ""
+  "Inspect the arguments and determine which version of the
+  create-color multimethod to invoke."
   ([args]
   (cond
    (or (symbol? args) (string? args) (keyword? args)) ::symbolic-color
@@ -242,7 +258,7 @@ L (Lightness or Luminance): Float value in the range 0.0 - 100.0
                      (format "Don't know how to process args: %s" arg)))))))
 
 (defmacro create-color-with-meta
-  "Create color with type meta"
+  "Create color with type metadata."
   [& body]
   `(with-meta
      ~@body
@@ -370,46 +386,46 @@ Multiple Arg
   (create-color [(.getRed color) (.getGreen color)
                  (.getBlue color) (.getAlpha color)]))
 
-(defn red "Return the red (int) component of this color" [color] ((:rgba color) 0))
-(defn green "Return the green (int) component of this color" [color] ((:rgba color) 1))
-(defn blue "Return the blue (int) component of this color" [color] ((:rgba color) 2))
-(defn hue "Return the hue (float) component of this color" [color] ((:hsl color) 0))
-(defn saturation "Return the saturation (float) component of this color" [color] ((:hsl color) 1))
-(defn lightness "Return the lightness (float) component of this color" [color] ((:hsl color) 2))
-(defn alpha "Return the alpha (int) component of this color" [color] ((:rgba color) 3))
+(defn red "Return the red (int) component of this color." [color] ((:rgba color) 0))
+(defn green "Return the green (int) component of this color." [color] ((:rgba color) 1))
+(defn blue "Return the blue (int) component of this color." [color] ((:rgba color) 2))
+(defn hue "Return the hue (float) component of this color." [color] ((:hsl color) 0))
+(defn saturation "Return the saturation (float) component of this color." [color] ((:hsl color) 1))
+(defn lightness "Return the lightness (float) component of this color." [color] ((:hsl color) 2))
+(defn alpha "Return the alpha (int) component of this color." [color] ((:rgba color) 3))
 
 
 (defn rgb-int
-  "Return a integer (RGB) representation of this color"
+  "Return a integer (RGB) representation of this color."
   [color]
   (rgb-int-from-components (red color) (green color) (blue color)))
 
 (defn rgba-int
-  "Return a integer (RGBA) representation of this color"
+  "Return a integer (RGBA) representation of this color."
   [color]
   (rgba-int-from-components (red color) (green color) (blue color) (alpha color)))
 
 (defn rgba-hexstr
-  "Return the hexcode string representation of this color"
+  "Return the hexcode string representation of this color."
   [color]
   (format "#%08X" (rgba-int color)))
 
 (defn rgb-hexstr
-  "Return the hexcode string representation of this color"
+  "Return the hexcode string representation of this color."
   [color]
   (format "#%06X" (rgb-int color)))
 
 (defn color-name
   "If there is an entry for this color value in the symbolic color
-names map, return that. Otherwise, return the hexcode string of this
-color's rgba integer value"
+  names map, return that. Otherwise, return the hexcode string of this
+  color's rgba integer value."
   [color]
   (if-let [color-name (named-colors-rgb-to-name (take 3 (:rgba color)))]
     color-name
     (format "%#08x" (rgba-int color))))
 
 (defn awt-color
-  "Return a java.awt.Color object using this color's rgba components"
+  "Return a java.awt.Color object using this color's rgba components."
   [color]
   (Color. (rgba-int color) true))
 
@@ -421,7 +437,7 @@ color's rgba integer value"
 
 (defn color=
   "Return true if rgba components are equal, and hsl float components
-are within tolerance"
+  are within tolerance."
   [color1 color2]
   (and (= (:rgba color1) (:rgba color2))
        (and (<= (abs (- (hue color1) (hue color2))) color-tolerance)
@@ -430,7 +446,7 @@ are within tolerance"
 
 (defn rgb-int-from-components
   "Convert a vector of the 3 rgb integer values into a color given in
-  numeric rgb format"
+  numeric rgb format."
   [r g b]
   (bit-or (bit-shift-left (bit-and r 0xFF) 16)
           (bit-or (bit-shift-left (bit-and g 0xFF) 8)
@@ -438,7 +454,7 @@ are within tolerance"
 
 (defn rgba-int-from-components
   "Convert a vector of the 4 rgba integer values into a color given in
-  numeric rgb format "
+  numeric rgb format."
   [r g b a]
   (bit-or (bit-shift-left (bit-and a 0xFF) 24)
           (bit-or (bit-shift-left (bit-and r 0xFF) 16)
@@ -447,7 +463,7 @@ are within tolerance"
 
 (defn rgb-int-to-components
   "Convert a color given in numeric rgb format into a vector of the 3
-  rgb integer values"
+  rgb integer values."
   [rgb-int]
   (into []
         (reverse
@@ -457,7 +473,7 @@ are within tolerance"
 
 (defn rgba-int-to-components
   "Convert a color given in numeric rgb format into a vector of the 4
-  rgba integer values"
+  rgba integer values."
   [rgba-int]
   (conj (rgb-int-to-components rgba-int)
         (bit-shift-right rgba-int 24)))
@@ -475,77 +491,124 @@ resultant rgba components.
 
 Result
 color - a new color that is the result of the binary operation."
-  [name bin-op]
+  [name docstring bin-op]
   `(defn ~name
+     ~docstring
      [color1# color2#]
      (create-color (vec (map clamp-rgb-int (map ~bin-op (:rgba color1#) (:rgba color2#)))))))
 
-(def-color-bin-op color-add +)
-(def-color-bin-op color-sub -)
-(def-color-bin-op color-mult *)
-(def-color-bin-op color-div /)
+(def-color-bin-op color-add
+  "Add the RGB values of two colors together, clamping each to a maximum of 255."
+  +)
 
-(defn mix [color1 color2 weight]
-  "This mix algorithm is plucked from the sass color module"
-  (let [p (/ weight 100.0)
-        w (- (* p 2) 1)
-        a (- (alpha color1) (alpha color2))
-        w1 (/ (+ 1
-                 (if (= (* w a) -1.0) w
-                     (/ (+ w a) (+ 1 (* w a)))))
-              2.0)
-        w2 (- 1 w1)
-        rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
-                                      (take 3 (:rgba color1)) (take 3 (:rgba color2))))
-        adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
-    (create-color (conj rgb adj-alpha))))
+(def-color-bin-op color-sub
+  "Subtract the RGB values of color2 from color 1, clamping each to a
+  minimum of 0."
+  -)
 
-(defn adjust-hue [color degrees]
+(def-color-bin-op color-mult
+  "Multiply the RGB values of two colors, clamping each to a maximum of 255"
+  *)
+
+(def-color-bin-op color-div
+  "Divide the RGB values of two colors."
+  /)
+
+(defn mix
+  "Produce a blend between two colors, optionally weighted by the
+  given percentage. Takes the average of each of the RGB components,
+  taking into account the opacity of each color. The weight specifies
+  the amount of the first color that should be included in the
+  returned color. The default value of 50.0 means that half the first
+  color and half the second color should be used. A value of 25.0
+  would count the second color three times as much as the first."
+  ([color1 color2]
+   (mix color1 color2 50.0))
+  ([color1 color2 weight]
+   (let [p (/ weight 100.0)
+         w (- (* p 2) 1)
+         a (- (alpha color1) (alpha color2))
+         w1 (/ (+ 1
+                  (if (= (* w a) -1.0) w
+                      (/ (+ w a) (+ 1 (* w a)))))
+               2.0)
+         w2 (- 1 w1)
+         rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
+                       (take 3 (:rgba color1)) (take 3 (:rgba color2))))
+         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
+     (create-color (conj rgb adj-alpha)))))
+
+(defn adjust-hue
+  "Shift the hue of the color around the color wheel by the specified
+  number of degrees. Will wrap around if it goes below 0.0 or above
+  360.0."
+  [color degrees]
   (create-color :h (clamp-hue (+ (hue color) degrees))
                 :s (saturation color)
                 :l (lightness color) :a (alpha color)))
 
-(defn saturate [color percent]
+(defn saturate
+  "Increase the saturation of the color by the specified amount, up to
+  a maximum of 100.0."
+  [color percent]
   (create-color :h (hue color)
                 :s (clamp-percent-float (+ (saturation color) percent))
                 :l (lightness color) :a (alpha color)))
 
-(defn desaturate [color percent]
+(defn desaturate
+  "Decrease the saturation of the color by the specified amount, down
+  to a minimum of 0.0."
+  [color percent]
   (create-color :h (hue color)
                 :s (clamp-percent-float (- (saturation color) percent))
                 :l (lightness color) :a (alpha color)))
 
-(defn lighten [color percent]
+(defn lighten
+  "Increase the lightness of the color by the specified amount, up to
+  a maximum of 100.0."
+  [color percent]
   (create-color :h (hue color)
                 :s (saturation color)
                 :l (clamp-percent-float (+ (lightness color) percent))
                 :a (alpha color)))
 
-(defn darken  [color percent]
+(defn darken
+  "Decrease the lightness of the color by the specified amount, down
+  to a minimum of 0.0."
+  [color percent]
   (create-color :h (hue color)
                 :s (saturation color)
                 :l (clamp-percent-float (- (lightness color) percent))
                 :a (alpha color)))
 
-(defn adjust-alpha [color unit-float-adj]
+(defn adjust-alpha
+  "Add an amount to the alpha (transparency) of the color, keeping it
+  within the allowable range of 0-255."
+   [color unit-float-adj]
   (create-color :h (hue color)
                 :s (saturation color)
                 :l (lightness color)
                 :a (clamp-unit-float (+ (rgb-int-to-unit-float (alpha color))
                                         unit-float-adj))))
 
-(defn grayscale [color]
+(defn grayscale
+  "Remove all hue from the color, converting it to a gray with the
+  same lightness level."
+  [color]
   (desaturate color 100.0))
 
-(defn opposite [color]
-  (adjust-hue color 180))
+(defn opposite
+  "Shift the hue of the color halfway around the color weel, to the
+  opposite color."
+ [color]
+ (adjust-hue color 180))
 
 (defn hue-to-rgb
   "Convert hue color to rgb components
-Based on algorithm described in:
-http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
-and:
-http://www.w3.org/TR/css3-color/#hsl-color"
+  Based on algorithm described in:
+  http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
+  and:
+  http://www.w3.org/TR/css3-color/#hsl-color"
   [m1, m2, hue]
   (let* [h (cond
            (< hue 0) (inc hue)
@@ -560,12 +623,12 @@ http://www.w3.org/TR/css3-color/#hsl-color"
 (defn hsl-to-rgb
   "Given color with HSL values return vector of r, g, b.
 
-Based on algorithms described in:
-http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_HSL_to_RGB
-and:
-http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
-and:
-http://www.w3.org/TR/css3-color/#hsl-color"
+  Based on algorithms described in:
+  http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_HSL_to_RGB
+  and:
+  http://en.wikipedia.org/wiki/Hue#Computing_hue_from_RGB
+  and:
+  http://www.w3.org/TR/css3-color/#hsl-color"
   [hue saturation lightness]
   (let* [h (/ hue 360.0)
          s (/ saturation 100.0)
@@ -581,9 +644,9 @@ http://www.w3.org/TR/css3-color/#hsl-color"
   (defn rgb-to-hsl
     "Given the three RGB values, convert to HSL and return vector of
   Hue, Saturation, Lightness.
-
-Based on algorithm described in:
-http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview"
+  
+  Based on algorithm described in:
+  http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview"
   [red green blue]
   (let* [r (/ red 255.0)
          g (/ green 255.0)
