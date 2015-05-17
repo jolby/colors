@@ -21,7 +21,7 @@
     2 [start end]
     (conj (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
             (if (= idx (dec n)) acc
-                (recur (conj acc num) step (+ step num) (inc idx)))) end)))
+                (recur (conj acc num) step (+ step num) (inc idx)))) end))))
 
 (defn rainbow-hsl
   "Computes a rainbow of colors (qualitative palette) defined by
