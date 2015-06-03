@@ -4,7 +4,7 @@
 This is mostly code ported from  the color module in SASS."
   :dependencies [[org.clojure/clojure "1.7.0-beta3"]
                  [org.clojure/math.numeric-tower "0.0.4"]
-                                  [org.clojure/core.incubator "0.1.3"]]
+                 [org.clojure/core.incubator "0.1.3"]]
 
   :autodoc { :name "colors"
             :description "Color and colorspace calculation, manipulation and conversion in Clojure."
