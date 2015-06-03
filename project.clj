@@ -1,5 +1,5 @@
 (defproject com.evocomputing/colors
-  "1.0.1-SNAPSHOT"
+  "1.0.2-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
   :dependencies [[org.clojure/clojure "1.7.0-beta3"]
