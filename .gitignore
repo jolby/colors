@@ -2,8 +2,16 @@ pom-generated.xml
 Manifest.txt
 colors.jar
 lib
-classes
 priv
 autodoc/**
 resources/**
 *.jar
+/target
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
