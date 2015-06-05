@@ -13,8 +13,9 @@
   (:use [com.evocomputing.colors :only (create-color)]))
 
 
-(defn inclusive-seq [n start end]
-  "Return n evenly spaced points along the range start - end (inclusive)"
+(defn inclusive-seq
+  "Return n evenly spaced points along the range start - end (inclusive)."
+  [n start end]
   (assert (< n 1)
   (condp = n
     1 [start]
@@ -110,10 +111,10 @@ be increased (1 = linear, 2 = quadratic, etc.)
          (inclusive-seq numcolors 1.0 0.0))))
 
 (defn heat-hsl
-  " Create heat palette in HSL space. By default, it goes from a red to a yellow hue, while
-simultaneously going to lighter colors (i.e., increasing
-lightness) and reducing the amount of color (i.e., decreasing
-saturation).
+  "Create heat palette in HSL space. By default, it goes from a red to
+  a yellow hue, while simultaneously going to lighter colors (i.e.,
+  increasing lightness) and reducing the amount of color (i.e.,
+  decreasing saturation).
 
 Arguments:
 numcolors: Number of colors to be produced in this palette.
@@ -139,7 +140,7 @@ be increased (1 = linear, 2 = quadratic, etc.)
         diff-h (- (:h-end opts) (:h-start opts))
         diff-s (- (:s-end opts) (:s-start opts))
         diff-l (- (:l-end opts) (:l-start opts))]
-    (map #(create-color :h (- (:h-end opts) (* (- diff-h %)))
+    (map #(create-color :h (- (:h-end opts) (* (- diff-h) %))
                         :s (- (:s-end opts) (* diff-s (Math/pow % (:power-saturation opts))))
                         :l (- (:l-end opts) (* diff-l (Math/pow % (:power-lightness opts)))))
          (inclusive-seq numcolors 1.0 0.0))))
