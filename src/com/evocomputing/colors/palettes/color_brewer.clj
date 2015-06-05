@@ -56,7 +56,7 @@
 (ns com.evocomputing.colors.palettes.color-brewer
   (:use [com.evocomputing.colors :only (create-color)])
   (:require
-   [clojure.core.string :as s]))
+   [clojure.string :as s]))
 
 
 (declare color-brewer-palettes)
