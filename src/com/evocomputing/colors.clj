@@ -92,7 +92,8 @@ http://cran.r-project.org/web/packages/colorspace/index.html
      (condp =  (count (matches 2))
        3 (apply str "0xff" (map #(str % %) (matches 2)))
        6 (apply str "0xff" (matches 2))
-       8 (apply str "0x" (matches 2))))))
+       8 (apply str "0x" (matches 2))))
+    (throw (IllegalArgumentException. (str "Unrecognized color, " hexstr)))))
 
 ;;Resolution/normalize code taken from Ruby color:
 ;;http://rubyforge.org/projects/color
