@@ -1,7 +1,9 @@
-(defproject com.evocomputing/colors
+(defproject org.clojars.brunchboy/colors
   "1.0.2-SNAPSHOT"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
+  :url "http://jolby.github.com/colors/"
+  :license "Eclipse Public License (EPL)"
   :dependencies [[org.clojure/clojure "1.7.0-beta3"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/core.incubator "0.1.3"]]
