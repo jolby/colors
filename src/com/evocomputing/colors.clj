@@ -375,7 +375,7 @@ Multiple Arg
 (defmethod create-color ::hsl-map [hsl-map & others]
   (let [hsl-map (if others (apply assoc {} (vec (conj others hsl-map))) hsl-map)
         ks (keys hsl-map)
-        hsl (check-hsl (into [] (map #(hsl-map %)
+        hsl (check-hsl (into [] (map #(float (hsl-map %))
                                      (map #(some % ks)
                                           '(#{:h :hue} #{:s :saturation} #{:l :lightness})))))
         rgb (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))

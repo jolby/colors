@@ -55,6 +55,8 @@
   (is (= :com.evocomputing.colors/color (type (create-color :r 255 :g 0 :blue 0 :a 255))))
   (is (= :com.evocomputing.colors/color (type (create-color {:h 120.0 :s 100.0 :l 50.0}))))
   (is (= :com.evocomputing.colors/color (type (create-color :h 120.0 :s 100.0 :l 50.0))))
+  (is (= :com.evocomputing.colors/color (type (create-color :h 120 :s 100 :l 50))))
+  (is (pos? (count (with-out-str (print (create-color :h 120 :s 100 :l 50))))))
   (is (= :com.evocomputing.colors/color (type (create-color (Color. 255 0 0)))))
   ;; test bad input checking
   (is (thrown? Exception (create-color "#badhexstring")))
