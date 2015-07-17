@@ -155,6 +155,6 @@ A or H, S, L, A parts.
 * Thanks
   I all but abandoned this project after 2010 or so. I'd like to thank everyone
   who have furthered the work on this project by submitting patches. [[https://github.com/brunchboy][James
-  Elliot]] deserves a special shout out for all the work he's done. Check out his
+  Elliott]] deserves a special shout out for all the work he's done. Check out his
   [[https://github.com/brunchboy][afterglow]] project to see a really cool project that uses colors to great
   effect.
