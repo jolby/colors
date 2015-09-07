@@ -556,10 +556,14 @@ color - a new color that is the result of the binary operation."
 (defn- hues-for-shortest-blend-path
   "Given a pair of colors, return their hue values adjusted so that
   their average value falls the shortest distance around the hue
-  circle between them, by denormalizing the smallest value if needed."
+  circle between them, by denormalizing the smallest value if needed.
+  Also makes sure that hue values are ignored for colors whose
+  saturation is zero."
   [color1 color2]
-  (let [hue1 (hue color1)
-        hue2 (hue color2)]
+  (let [base-hue1 (hue color1)
+        base-hue2 (hue color2)
+        hue1 (if (> (saturation color1) 0.0) base-hue1 base-hue2)
+        hue2 (if (> (saturation color2) 0.0) base-hue2 base-hue1)]
     (if (< (abs (- hue1 hue2)) 180.0)
       [hue1 hue2]
       (if (< hue1 hue2)
