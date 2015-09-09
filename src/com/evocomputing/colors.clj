@@ -515,6 +515,27 @@ color - a new color that is the result of the binary operation."
   "Divide the RGB values of two colors."
   /)
 
+(defn- mix-weights
+  "Calculate the weight values to use when mixing two color
+  components, taking into account the opacity of each color. Takes the
+  two colors, and the percentage weight to assign the first color
+  compared to the second; a value of 50.0 considers both equally,
+  while a value of 25.0 would count the second color three times as
+  much as the first. Returns a vector containing the weight as a
+  fraction from 0 to 1, and the fractions by which values in color 1
+  and color 2 should be multiplied before summing in order to obtain
+  the correct mix."
+  [color1 color2 weight]
+  (let [p (/ weight 100.0)
+        w (- (* p 2) 1)
+        a (- (alpha color1) (alpha color2))
+        w1 (/ (+ 1
+                 (if (= (* w a) -1.0) w
+                     (/ (+ w a) (+ 1 (* w a)))))
+              2.0)
+        w2 (- 1 w1)]
+    [p w1 w2]))
+
 (defn mix
   "Produce a blend between two colors, optionally weighted by the
   given percentage. Takes the average of each of the RGB components,
@@ -526,18 +547,49 @@ color - a new color that is the result of the binary operation."
   ([color1 color2]
    (mix color1 color2 50.0))
   ([color1 color2 weight]
-   (let [p (/ weight 100.0)
-         w (- (* p 2) 1)
-         a (- (alpha color1) (alpha color2))
-         w1 (/ (+ 1
-                  (if (= (* w a) -1.0) w
-                      (/ (+ w a) (+ 1 (* w a)))))
-               2.0)
-         w2 (- 1 w1)
+   (let [[p w1 w2] (mix-weights color1 color2 weight)
          rgb (vec (map #(clamp-rgb-int (int (+ (* %1 w1) (* %2 w2))))
                        (take 3 (:rgba color1)) (take 3 (:rgba color2))))
-         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p)))) ]
+         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p))))]
      (create-color (conj rgb adj-alpha)))))
+
+(defn- hues-for-shortest-blend-path
+  "Given a pair of colors, return their hue values adjusted so that
+  their average value falls the shortest distance around the hue
+  circle between them, by denormalizing the smallest value if needed.
+  Also makes sure that hue values are ignored for colors whose
+  saturation is zero."
+  [color1 color2]
+  (let [base-hue1 (hue color1)
+        base-hue2 (hue color2)
+        hue1 (if (> (saturation color1) 0.0) base-hue1 base-hue2)
+        hue2 (if (> (saturation color2) 0.0) base-hue2 base-hue1)]
+    (if (< (abs (- hue1 hue2)) 180.0)
+      [hue1 hue2]
+      (if (< hue1 hue2)
+        [(+ hue1 360.0) hue2]
+        [hue1 (+ hue2 360.0)]))))
+
+(defn mix-hsl
+  "Produce a blend between two colors in the HSL color space,
+  optionally weighted by the given percentage. Takes the average of
+  each of the HSL components (always going the shortest distance
+  around the hue circle), taking into account the opacity of each
+  color. The weight specifies the amount of the first color that
+  should be included in the returned color. The default value of 50.0
+  means that half the first color and half the second color should be
+  used. A value of 25.0 would count the second color three times as
+  much as the first."
+  ([color1 color2]
+   (mix-hsl color1 color2 50.0))
+  ([color1 color2 weight]
+   (let [[p w1 w2] (mix-weights color1 color2 weight)
+         [hue1 hue2] (hues-for-shortest-blend-path color1 color2)
+         h (clamp-hue (+ (* hue1 w1) (* hue2 w2)))
+         s (clamp-percent-float (+ (* (saturation color1) w1) (* (saturation color2) w2)))
+         l (clamp-percent-float (+ (* (lightness color1) w1) (* (lightness color2) w2)))
+         adj-alpha (int (+ (* (alpha color1) p) (* (alpha color2) (- 1 p))))]
+     (create-color :h h :s s :l l :a adj-alpha))))
 
 (defn adjust-hue
   "Shift the hue of the color around the color wheel by the specified
