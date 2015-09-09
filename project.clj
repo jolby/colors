@@ -1,5 +1,5 @@
 (defproject com.evocomputing/colors
-  "1.0.2"
+  "1.0.3"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
   :url "http://jolby.github.com/colors/"
