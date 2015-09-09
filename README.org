@@ -20,7 +20,7 @@
   your lein project like normal:
 
 #+BEGIN_EXAMPLE 
-  :dependencies [[com.evocomputing/colors "1.0.2"]
+  :dependencies [[com.evocomputing/colors "1.0.3"]
                  ...other deps ]]
 #+END_EXAMPLE
 
