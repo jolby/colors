@@ -33,7 +33,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
        :author "Joel Boehland"}
 
   com.evocomputing.colors
-  (import (java.awt Color))
+  (:import (java.awt Color))
   (:use [clojure.math.numeric-tower :only [abs round]]
         [clojure.core.incubator :only [seqable?]])
   (:require [com.evocomputing.colors.palettes.webcolors :as wc]))
@@ -697,7 +697,7 @@ color - a new color that is the result of the binary operation."
   (defn rgb-to-hsl
     "Given the three RGB values, convert to HSL and return vector of
   Hue, Saturation, Lightness.
-  
+
   Based on algorithm described in:
   http://en.wikipedia.org/wiki/Luminance-Hue-Saturation#Conversion_from_RGB_to_HSL_overview"
   [red green blue]
