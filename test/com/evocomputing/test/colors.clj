@@ -11,7 +11,7 @@
 
 
 (ns com.evocomputing.test.colors
-  (import (java.awt Color))
+  (:import (java.awt Color))
   (:use (clojure test))
   (:use (com.evocomputing colors))
   (:require [clojure.string :as s]))
@@ -116,4 +116,3 @@
                         "Saturations should be equal")
           (throw-if-not (within-tolerance? (lightness hsl-color) (lightness rgb-color))
                         "Lightnesses should be equal")))))
-

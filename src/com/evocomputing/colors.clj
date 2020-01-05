@@ -34,9 +34,8 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
   com.evocomputing.colors
   (:import (java.awt Color))
-  (:use [clojure.math.numeric-tower :only [abs round]]
-        [clojure.core.incubator :only [seqable?]])
-  (:require [com.evocomputing.colors.palettes.webcolors :as wc]))
+  (:require [com.evocomputing.colors.palettes.webcolors :as wc]
+            [clojure.math.numeric-tower :refer [abs round]]))
 
 (declare rgb-int-to-components rgba-int-to-components
          rgb-int-from-components rgba-int-from-components
