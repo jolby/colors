@@ -1,5 +1,5 @@
 (defproject com.evocomputing/colors
-  "1.0.5"
+  "1.0.6"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
   :url "http://jolby.github.com/colors/"
@@ -7,7 +7,7 @@ This is mostly code ported from  the color module in SASS."
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
 
-  :autodoc { :name "colors"
+  :autodoc {:name "colors"
             :description "Color and colorspace calculation, manipulation and conversion in Clojure."
             :page-title "Colors API documentation"
             :copyright "Eclipse Public License (EPL)"
