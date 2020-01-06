@@ -12,17 +12,18 @@
 (ns com.evocomputing.colors.palettes.core
   (:use [com.evocomputing.colors :only (create-color)]))
 
-
 (defn inclusive-seq
   "Return n evenly spaced points along the range start - end (inclusive)."
   [n start end]
-  (assert (< n 1)
+  (assert (pos? n))
   (condp = n
     1 [start]
     2 [start end]
-    (conj (loop [acc [] step (/ (- end start) (- n 1)) num start idx 0]
-            (if (= idx (dec n)) acc
-                (recur (conj acc num) step (+ step num) (inc idx)))) end))))
+    (let [numsegs (dec n)
+          step (/ (- end start) numsegs)]
+      (conj (loop [acc [] num start idx 0]
+              (if (= idx numsegs) acc
+                  (recur (conj acc num) (+ step num) (inc idx)))) end))))
 
 (defn rainbow-hsl
   "Computes a rainbow of colors (qualitative palette) defined by
@@ -78,7 +79,6 @@ be increased (1 = linear, 2 = quadratic, etc.) (default 1.5)
                         :s (* (:s opts) (Math/pow (Math/abs %) (:power opts)))
                         :l (- (:l-end opts) (* diff-l (Math/pow (Math/abs %) (:power opts)))))
          (inclusive-seq numcolors -1.0 1.0))))
-
 
 (defn sequential-hsl
   "Creates a sequential palette starting at the full color
