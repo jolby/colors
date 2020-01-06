@@ -1,6 +1,9 @@
 * About
-  Colors provides color manipulation routines to
-  Clojure. 
+  Colors provides color manipulation routines to Clojure. Note that while this
+  project is being used by some folks, it isn't in very active development.
+  Another more active clojure project working in the same space is:
+
+  https://github.com/thi-ng/color
 
   Further references:
   - HSL and HSV:
@@ -20,7 +23,7 @@
   your lein project like normal:
 
 #+BEGIN_EXAMPLE 
-  :dependencies [[com.evocomputing/colors "1.0.4"]
+  :dependencies [[com.evocomputing/colors "1.0.6"]
                  ...other deps ]]
 #+END_EXAMPLE
 
