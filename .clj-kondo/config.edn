@@ -1,0 +1,2 @@
+{:lint-as {com.evocomputing.macros/def-color-bin-op cljs.core/def
+           com.evocomputing.macros/create-color-with-meta cljs.core/with-meta}}

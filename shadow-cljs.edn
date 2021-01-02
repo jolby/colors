@@ -1,0 +1,15 @@
+{:source-paths ["src" "test"]
+
+ :dependencies [[binaryage/devtools "1.0.2"]]
+
+ :builds
+ {:browser-test
+  {:target    :browser-test
+   :ns-regexp "-test$"
+   :runner-ns shadow.test.browser
+   :test-dir  "target/browser-test"
+   :devtools  {:http-root "target/browser-test"
+               :http-port 8900}}
+  :node-test {:target :node-test
+              :output-to "target/node-test.js"
+              :ns-regexp "-test$"}}}
