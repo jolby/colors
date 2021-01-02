@@ -47,7 +47,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
 (defrecord
     ^{:doc
-      "Structure representing a color. Default representation
+      "Record representing a color. Default representation
     is an array of integers mapping to the respective RGB(A)
     values. This structure also supports holding an array of float
     values mapping to the respective HSL values as well"}
@@ -76,7 +76,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   (merge wc/html4-name-to-rgb wc/x11-name-to-rgb))
 
 (def named-colors-rgb-to-name
-  "Maps the nown color RGB values to their names."
+  "Maps the known color RGB values to their names."
   (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
 
 (defn hexstring-to-rgba-int
