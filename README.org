@@ -34,7 +34,7 @@ Or deps.edn using a particular git commit SHA
   {:deps
     ...
     com.evocomputing/colors {:git/url "https://github.com/jolby/colors.git"
-                             :sha ""}
+                             :sha "3f31b34e429bdde1d777776abea221a177f1a7a0"}
     ... other deps
   }
 #+END_EXAMPLE
