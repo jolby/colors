@@ -10,7 +10,7 @@
 ;; remove this notice, or any other, from this software.
 
 
-(ns com.evocomputing.test.colors
+(ns com.evocomputing.colors-test
   (:import (java.awt Color))
   (:use (clojure test))
   (:use (com.evocomputing colors))
