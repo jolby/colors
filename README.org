@@ -1,5 +1,5 @@
 * About
-  Colors provides color manipulation routines to Clojure. Note that while this
+  Colors provides color manipulation routines to Clojure/Clojurescript. Note that while this
   project is being used by some folks, it isn't in very active development.
 
   Another active clojure project working in the same space is:
@@ -24,14 +24,23 @@ deps.clj deps.edn
 #+BEGIN_EXAMPLE
   {:deps
     ...
-    com.evocomputing/colors {:mvn/version "1.0.6"}
+    com.evocomputing/colors {:mvn/version "1.0.7"}
     ... other deps
   }
 #+END_EXAMPLE
 
+Or deps.edn using a particular git commit SHA
+#+BEGIN_EXAMPLE
+  {:deps
+    ...
+    com.evocomputing/colors {:git/url "https://github.com/jolby/colors.git"
+                             :sha ""}
+    ... other deps
+  }
+#+END_EXAMPLE
 lein project.clj
 #+BEGIN_EXAMPLE
-  :dependencies [[com.evocomputing/colors "1.0.6"]
+  :dependencies [[com.evocomputing/colors "1.0.7"]
                  ...other deps ]]
 #+END_EXAMPLE
 
