@@ -15,3 +15,7 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+package-lock.json
+node_modules
+.shadow-cljs
+.cache

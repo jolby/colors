@@ -32,29 +32,34 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 "
        :author "Joel Boehland"}
 
-  com.evocomputing.colors
-  (:import (java.awt Color))
+    com.evocomputing.colors
+  #?(:clj (:import (java.awt Color)))
   (:require [com.evocomputing.colors.palettes.webcolors :as wc]
-            [clojure.math.numeric-tower :refer [abs round]]))
+            [com.evocomputing.utils :as utils]
+            [com.evocomputing.macros :refer [def-color-bin-op create-color-with-meta]]
+            #?(:cljs [goog.string :refer [format]])
+            #?(:clj [clojure.math.numeric-tower :refer [abs round]]
+               :cljs [com.evocomputing.math :refer [abs round]])))
 
 (declare rgb-int-to-components rgba-int-to-components
          rgb-int-from-components rgba-int-from-components
          rgb-to-hsl hsl-to-rgb)
 
-(defstruct
+(defrecord
     ^{:doc
-       "Structure representing a color. Default representation
+      "Structure representing a color. Default representation
     is an array of integers mapping to the respective RGB(A)
     values. This structure also supports holding an array of float
     values mapping to the respective HSL values as well"}
-  color
-  ;;4 integer array representation of the rgba values. Rgba values
-  ;;must be between 0 and 255 inclusive
-  :rgba
-  ;;3 float array holding the HSL values for this color. The
-  ;;saturation and lightness must be between 0.0 and 100.0. Hue must
-  ;;be between 0.0 and 360.0
-  :hsl)
+    color
+    [
+     ;;4 integer array representation of the rgba values. Rgba values
+     ;;must be between 0 and 255 inclusive
+     rgba
+     ;;3 float array holding the HSL values for this color. The
+     ;;saturation and lightness must be between 0.0 and 100.0. Hue must
+     ;;be between 0.0 and 360.0
+     hsl])
 
 (def allowable-rgb-keys
   "The keyword arguments which may be used to create an RGB color."
@@ -74,25 +79,17 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   "Maps the nown color RGB values to their names."
   (merge wc/html4-rgb-to-name wc/x11-rgb-to-name))
 
-(defn throw-if-not
-  "Throws an Exception if test is false. Arguments are those
-  documented for throwf."
-  [test & args]
-  (when-not test
-    (let [message (apply format args)]
-      (throw (Exception. ^java.lang.String message )))))
-
 (defn hexstring-to-rgba-int
   "Convert a hexadecimal string to the corresponding array of RGBA
   integer values."
   [hexstr]
   (if-let [matches (re-find #"(^#|^0[Xx])([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" hexstr)]
-    (Long/decode
-     (condp =  (count (matches 2))
-       3 (apply str "0xff" (map #(str % %) (matches 2)))
-       6 (apply str "0xff" (matches 2))
-       8 (apply str "0x" (matches 2))))
-    (throw (IllegalArgumentException. (str "Unrecognized color, " hexstr)))))
+    (utils/decode-long
+      (condp =  (count (matches 2))
+        3 (apply str "0xff" (map #(str % %) (matches 2)))
+        6 (apply str "0xff" (matches 2))
+        8 (apply str "0x" (matches 2))))
+    (utils/throw-with-type :illegal-argument (str "Unrecognized color, " hexstr))))
 
 ;;Resolution/normalize code taken from Ruby color:
 ;;http://rubyforge.org/projects/color
@@ -174,15 +171,15 @@ http://cran.r-project.org/web/packages/colorspace/index.html
   "Check that the passed in float is in the range 0.0 - 1.0, then
 convert it to the appropriate integer in the range 0 - 255."
   [fval]
-  (throw-if-not (unit-float? fval)
-                "fval must be a float between 0.0 and 0.1: %s" fval)
+  (utils/throw-if-not (unit-float? fval)
+                      "fval must be a float between 0.0 and 0.1: %s" fval)
   (int (+ 0.5 (* fval 255))))
 
 (defn rgb-int-to-unit-float
- "Convert the integer in range 0 - 255 to float in range 0.0 - 1.0."
- [rgb-int]
- (throw-if-not (rgb-int? rgb-int) "Must be integer in range 0 - 255")
- (/ rgb-int 255.0))
+  "Convert the integer in range 0 - 255 to float in range 0.0 - 1.0."
+  [rgb-int]
+  (utils/throw-if-not (rgb-int? rgb-int) "Must be integer in range 0 - 255")
+  (/ rgb-int 255.0))
 
 (defn maybe-convert-alpha
   "If alpha is a float value, try to convert to integer in range 0 -
@@ -190,31 +187,31 @@ convert it to the appropriate integer in the range 0 - 255."
   [alpha]
   (if (rgb-int? alpha) alpha
       (do
-        (throw-if-not (unit-float? alpha)
-                      "alpha must be an integer in range 0 - 255 or unit float: %s" alpha)
+        (utils/throw-if-not (unit-float? alpha)
+                            "alpha must be an integer in range 0 - 255 or unit float: %s" alpha)
         (unit-float-to-rgba-int alpha))))
 
 (defn check-rgb
   "Check that every element in the passed in rgba sequence is an
   integer in the range 0 - 255."
   ([rgb]
-     (throw-if-not (and (= (count rgb) 3) (every? #'rgb-int? rgb))
-                   "Must contain 3 integers in range 0 - 255: %s" rgb)
-     rgb)
+   (utils/throw-if-not (and (= (count rgb) 3) (every? #'rgb-int? rgb))
+                       "Must contain 3 integers in range 0 - 255: %s" rgb)
+   rgb)
   ([r g b]
-     (throw-if-not (every? #'rgb-int? [r g b])
-     "Must contain 3 integers in range 0 - 255: %s" [r g b])))
+   (utils/throw-if-not (every? #'rgb-int? [r g b])
+                       "Must contain 3 integers in range 0 - 255: %s" [r g b])))
 
 (defn check-rgba
   "Check that every element in the passed in rgba sequence is an
   integer in the range 0 - 255."
   ([rgba]
-     (throw-if-not (and (= (count rgba) 4) (every? #'rgb-int? rgba))
-                   "Must contain 4 integers in range 0 - 255: %s" rgba)
-     rgba)
+   (utils/throw-if-not (and (= (count rgba) 4) (every? #'rgb-int? rgba))
+                       "Must contain 4 integers in range 0 - 255: %s" rgba)
+   rgba)
   ([r g b a]
-     (throw-if-not (every? #'rgb-int? [r g b a])
-     "Must contain 4 integers in range 0 - 255: %s" [r g b a])))
+   (utils/throw-if-not (every? #'rgb-int? [r g b a])
+                       "Must contain 4 integers in range 0 - 255: %s" [r g b a])))
 
 (defn check-hsl
   "Check that every element is of the format:
@@ -222,13 +219,13 @@ convert it to the appropriate integer in the range 0 - 255."
   - 2nd, S (Saturation): Float value in the range: 0.0 - 100.0.
   - 3rd, L (Lightness or Luminance): Float value in the range 0.0 - 100.0."
   ([hsl]
-     (throw-if-not (and (= (count hsl) 3) (not (some nil? hsl)))
-                   "Must contain 3 floats representing HSL: %s" hsl)
-     (check-hsl (hsl 0) (hsl 1) (hsl 2))
-     [(clamp-hue (hsl 0)) (hsl 1) (hsl 2)])
-  ([h s l] (throw-if-not (and (circle-float? (clamp-hue h))
-                              (percent-float? s) (percent-float? l))
-                         "Elements must be of the form:
+   (utils/throw-if-not (and (= (count hsl) 3) (not (some nil? hsl)))
+                       "Must contain 3 floats representing HSL: %s" hsl)
+   (check-hsl (hsl 0) (hsl 1) (hsl 2))
+   [(clamp-hue (hsl 0)) (hsl 1) (hsl 2)])
+  ([h s l] (utils/throw-if-not (and (circle-float? (clamp-hue h))
+                                    (percent-float? s) (percent-float? l))
+                               "Elements must be of the form:
 H (Hue): Float value in the range of: 0.0 - 360.0
 S (Saturation): Float value in the range: 0.0 - 100.0
 L (Lightness or Luminance): Float value in the range 0.0 - 100.0
@@ -239,30 +236,23 @@ L (Lightness or Luminance): Float value in the range 0.0 - 100.0
   "Inspect the arguments and determine which version of the
   create-color multimethod to invoke."
   ([args]
-  (cond
-   (or (symbol? args) (string? args) (keyword? args)) ::symbolic-color
-   (integer? args) ::rgb-int
-   (and (map? args) (some allowable-rgb-keys (keys args))) ::rgb-map
-   (and (map? args) (some allowable-hsl-keys (keys args))) ::hsl-map
-   (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
-   (= (class args) Color) Color
-   true (throw (IllegalArgumentException.
-                (format "Don't know how to process args: %s" args)))))
+   (cond
+     (or (symbol? args) (string? args) (keyword? args))           ::symbolic-color
+     (integer? args)                                              ::rgb-int
+     (and (map? args) (some allowable-rgb-keys (keys args)))      ::rgb-map
+     (and (map? args) (some allowable-hsl-keys (keys args)))      ::hsl-map
+     (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
+     #?(:clj (= (class args) Color))                              #?(:clj Color)
+     :else                                                        (utils/throw-with-type :illegal-argument
+                                  (format "Don't know how to process args: %s" args))))
   ([arg & others]
-     (let [args (conj others arg)]
-       (cond
-        (and (keyword? arg) (some allowable-rgb-keys args)) ::rgb-map
-        (and (keyword? arg) (some allowable-hsl-keys args)) ::hsl-map
-        (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
-        true (throw (IllegalArgumentException.
-                     (format "Don't know how to process args: %s" arg)))))))
-
-(defmacro create-color-with-meta
-  "Create color with type metadata."
-  [& body]
-  `(with-meta
-     ~@body
-      {:type ::color}))
+   (let [args (conj others arg)]
+     (cond
+       (and (keyword? arg) (some allowable-rgb-keys args))          ::rgb-map
+       (and (keyword? arg) (some allowable-hsl-keys args))          ::hsl-map
+       (and (or (seq? args) (seqable? args)) (#{3 4} (count args))) ::rgb-array
+       :else                                                        (utils/throw-with-type :illegal-argument
+                                    (format "Don't know how to process args: %s" arg))))))
 
 (defmulti create-color
   "Create a color struct using the passed in args.
@@ -358,8 +348,8 @@ Multiple Arg
         rgba (conj (into [] (take 3 rgb-array)) alpha) ]
     (check-rgba rgba)
     (create-color-with-meta
-      (struct color rgba
-              (rgb-to-hsl (rgba 0) (rgba 1) (rgba 2))))))
+      (->color rgba
+               (rgb-to-hsl (rgba 0) (rgba 1) (rgba 2))))))
 
 (defmethod create-color ::rgb-map [rgb-map & others]
   (let [rgb-map (if others (apply assoc {} (vec (conj others rgb-map))) rgb-map)
@@ -377,14 +367,14 @@ Multiple Arg
         hsl (check-hsl (into [] (map #(float (hsl-map %))
                                      (map #(some % ks)
                                           '(#{:h :hue} #{:s :saturation} #{:l :lightness})))))
-        rgb (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))
-        alpha (maybe-convert-alpha (or (:a hsl-map) (:alpha hsl-map) 255))
-        rgba (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
-    (create-color-with-meta (struct color rgba hsl))))
+        rgb     (hsl-to-rgb (hsl 0) (hsl 1) (hsl 2))
+        alpha   (maybe-convert-alpha (or (:a hsl-map) (:alpha hsl-map) 255))
+        rgba    (check-rgba (if alpha (conj rgb alpha) (conj rgb 255)))]
+    (create-color-with-meta (->color rgba hsl))))
 
-(defmethod create-color Color [^java.awt.Color color]
-  (create-color [(.getRed color) (.getGreen color)
-                 (.getBlue color) (.getAlpha color)]))
+#?(:clj (defmethod create-color Color [^java.awt.Color color]
+          (create-color [(.getRed color) (.getGreen color)
+                         (.getBlue color) (.getAlpha color)])))
 
 (defn red "Return the red (int) component of this color." [color] ((:rgba color) 0))
 (defn green "Return the green (int) component of this color." [color] ((:rgba color) 1))
@@ -424,16 +414,16 @@ Multiple Arg
     color-name
     (format "%#08x" (rgba-int color))))
 
-(defn awt-color
-  "Return a java.awt.Color object using this color's rgba components."
-  [color]
-  (Color. (rgba-int color) true))
+#?(:clj (defn awt-color
+          "Return a java.awt.Color object using this color's rgba components."
+          [color]
+          (Color. (rgba-int color) true)))
 
-(defmethod print-method ::color [color writer]
-  (print-method (format "#<color: %s R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
-                        (color-name color) (red color) (green color) (blue color)
-                        (hue color) (saturation color) (lightness color) (alpha color))
-                writer))
+#?(:clj (defmethod print-method ::color [color writer]
+          (print-method (format "#<color: %s R: %d, G: %d, B: %d, H: %.2f, S: %.2f, L: %.2f, A: %d>"
+                                (color-name color) (red color) (green color) (blue color)
+                                (hue color) (saturation color) (lightness color) (alpha color))
+                        writer)))
 
 (defn color=
   "Return true if rgba components are equal, and hsl float components
@@ -467,35 +457,16 @@ Multiple Arg
   [rgb-int]
   (into []
         (reverse
-         (for [n (range 0 3)]
-           (bit-and
-            (bit-shift-right rgb-int (bit-shift-left n 3)) 0xff)))))
+          (for [n (range 0 3)]
+            (bit-and
+              (unsigned-bit-shift-right rgb-int (bit-shift-left n 3)) 0xff)))))
 
 (defn rgba-int-to-components
   "Convert a color given in numeric rgb format into a vector of the 4
   rgba integer values."
   [rgba-int]
   (conj (rgb-int-to-components rgba-int)
-        (bit-shift-right rgba-int 24)))
-
-(defmacro def-color-bin-op
-  "Macro for creating binary operations between two colors.
-
-Arguments
-name - the name of the operation.
-
-bin-op - the function that takes two values, producing one from
-those. (eg: + - * /). This op will be applied pairwise to the
-repective color's rgba components to create a new color with the
-resultant rgba components.
-
-Result
-color - a new color that is the result of the binary operation."
-  [name docstring bin-op]
-  `(defn ~name
-     ~docstring
-     [color1# color2#]
-     (create-color (vec (map clamp-rgb-int (map ~bin-op (:rgba color1#) (:rgba color2#)))))))
+        (unsigned-bit-shift-right rgba-int 24)))
 
 (def-color-bin-op color-add
   "Add the RGB values of two colors together, clamping each to a maximum of 255."
@@ -693,7 +664,8 @@ color - a new color that is the result of the binary operation."
                    [(hue-to-rgb m1 m2 (+ h (/ 1.0 3)))
                     (hue-to-rgb m1 m2 h)
                     (hue-to-rgb m1 m2 (- h (/ 1.0 3)))]))))
-  (defn rgb-to-hsl
+
+(defn rgb-to-hsl
     "Given the three RGB values, convert to HSL and return vector of
   Hue, Saturation, Lightness.
 

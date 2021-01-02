@@ -9,30 +9,31 @@
 ;; agreeing to be bound by the terms of this license.  You must not
 ;; remove this notice, or any other, from this software.
 
-(ns com.evocomputing.colors.palettes.webcolors)
+(ns com.evocomputing.colors.palettes.webcolors
+  (:require [com.evocomputing.utils :as utils]))
 
 
 (def x11-pattern (re-pattern #"\s*(\d+)\s+(\d+)\s+(\d+)\s+(.*)"))
 
-(defn process-x11-line [line]
-  (if-let [match (re-matches x11-pattern line)]
-    (let [r (Integer/parseInt (match 1))
-          g (Integer/parseInt (match 2))
-          b (Integer/parseInt (match 3))
-          name (.toLowerCase (.replace ^java.lang.String (match 4) " " ""))]
-      [[r g b] name])))
+#?(:clj (defn process-x11-line [line]
+          (when-let [match (re-matches x11-pattern line)]
+            (let [r    (utils/parse-int (match 1))
+                  g    (utils/parse-int (match 2))
+                  b    (utils/parse-int (match 3))
+                  name (.toLowerCase (.replace ^java.lang.String (match 4) " " ""))]
+              [[r g b] name]))))
 
-(defn read-x11-colors [path]
-  (with-open [reader (java.io.BufferedReader. (java.io.FileReader. ^java.lang.String path))]
-    (loop [colors []
-           seen-colors #{}]
-      (let [line (.readLine reader)]
-        (if-not line
-          colors
-          (let [cvals (process-x11-line line)
-                newcolors (if (and cvals (not (seen-colors (cvals 1)))) (conj colors cvals) colors)
-                new-seen-colors (if cvals (conj seen-colors (cvals 1)) seen-colors )]
-            (recur newcolors new-seen-colors)))))))
+#?(:clj (defn read-x11-colors [path]
+          (with-open [reader (java.io.BufferedReader. (java.io.FileReader. ^java.lang.String path))]
+            (loop [colors      []
+                   seen-colors #{}]
+              (let [line (.readLine reader)]
+                (if-not line
+                  colors
+                  (let [cvals           (process-x11-line line)
+                        newcolors       (if (and cvals (not (seen-colors (cvals 1)))) (conj colors cvals) colors)
+                        new-seen-colors (if cvals (conj seen-colors (cvals 1)) seen-colors )]
+                    (recur newcolors new-seen-colors))))))))
 
 (def html4-colors
 [[[0 255 0] "lime"]
