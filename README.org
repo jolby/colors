@@ -1,7 +1,8 @@
 * About
   Colors provides color manipulation routines to Clojure. Note that while this
   project is being used by some folks, it isn't in very active development.
-  Another more active clojure project working in the same space is:
+
+  Another active clojure project working in the same space is:
 
   https://github.com/thi-ng/color
 
@@ -19,10 +20,17 @@
   - R ColorBrewer palettes:
     http://sekhon.berkeley.edu/library/RColorBrewer/html/ColorBrewer.html
 * Install
-  Colors is now up on clojars, so you can add it as a dependency to
-  your lein project like normal:
+deps.clj deps.edn
+#+BEGIN_EXAMPLE
+  {:deps
+    ...
+    com.evocomputing/colors {:mvn/version "1.0.6"}
+    ... other deps
+  }
+#+END_EXAMPLE
 
-#+BEGIN_EXAMPLE 
+lein project.clj
+#+BEGIN_EXAMPLE
   :dependencies [[com.evocomputing/colors "1.0.6"]
                  ...other deps ]]
 #+END_EXAMPLE
@@ -34,7 +42,7 @@
    takes a wide range of representations to be passed to the
    create-color multimethod
 #+BEGIN_EXAMPLE 
-(use 'com.evocomputing.colors)
+(require '[com.evocomputing.colors :refer [create-color]])
 
 ;;Symbolic: Either a string or keyword or symbol that matches an entry
 ;;in the symbolic color pallete. Currently, this is defaults to the
@@ -75,17 +83,17 @@ or a packed 32 bit integer representation, or its component R, G, B,
 A or H, S, L, A parts.
 
 #+BEGIN_EXAMPLE 
-(use 'com.evocomputing.colors)
+(require '[com.evocomputing.colors :as c])
 
-(def red-color (create-color :red))
+(def red-color (c/create-color :red))
 ;;Convert to java.awt.Color
-(awt-color red-color)
+(c/awt-color red-color)
 
 ;;get the rgba integer representation
-(rgba-int red-color)
+(c/rgba-int red-color)
 
 ;;get the hexstring representation
-(rgb-hexstr red-color)
+(c/rgb-hexstr red-color)
 
 ;;get a vector of the constituent rgba components
 (:rgba red-color)
@@ -97,22 +105,22 @@ A or H, S, L, A parts.
 ** Manipulate colors
    You can easily manipulate and adjust colors with simple operations
 #+BEGIN_EXAMPLE 
-(use 'com.evocomputing.colors)
+(require '[com.evocomputing.colors :as c])
 
-(def blue-color (create-color :blue))
+(def blue-color (c/create-color :blue))
 ;; => "#<color: blue R: 0, G: 0, B: 255, H: 240.00, S: 100.00, L:#50.00, A: 255>"
 
 ;;Create new color 1/3 way around color wheel
 ;;to get new primary red color
-(adjust-hue blue-color 120)
+(c/adjust-hue blue-color 120)
 ;; => "#<color: red R: 255, G: 0, B: 0, H: 0.00, S: 100.00, L: 50.00, A: 255>"
 
 ;;lighten by 20%
-(lighten blue-color 20)
+(c/lighten blue-color 20)
 ;; => "#<color: 0xff6666ff R: 102, G: 102, B: 255, H: 240.00, S: 100.00, L: 70.00, A: 255>"
 
 ;;darken by 20%
-(darken blue-color 20)
+(c/darken blue-color 20)
 ;; => "#<color: 0xff000099 R: 0, G: 0, B: 153, H: 240.00, S: 100.00,#L: 30.00, A: 255>"
 
 #+END_EXAMPLE
@@ -125,9 +133,9 @@ A or H, S, L, A parts.
    http://cran.r-project.org/web/packages/colorspace/index.html
 
 #+BEGIN_EXAMPLE 
-(use 'com.evocomputing.colors)
-(use 'com.evocomputing.colors.palettes.core)
-(use 'com.evocomputing.colors.palettes.color-brewer)
+(require '[com.evocomputing.colors.palettes.core
+    :refer [rainbow-hsl diverge-hsl heat-hsl]])
+(require '[com.evocomputing.colors.palettes.color-brewer :as cb])
 
 ;;Create a rainbow qualitative palette of 10 colors
 ;;each with different hues given a single value of each
@@ -147,7 +155,7 @@ A or H, S, L, A parts.
 
 ;;Create an 8 item ColorBrewer sequential palette "YlOrRd" (Yellow,
 ;;Orange, Red)
-(get-color-brewer-palette "YlOrRd" 8)
+(cb/get-color-brewer-palette "YlOrRd" 8)
 #+END_EXAMPLE
 
 * Documentation
@@ -160,4 +168,4 @@ A or H, S, L, A parts.
   who have furthered the work on this project by submitting patches. [[https://github.com/brunchboy][James
   Elliott]] deserves a special shout out for all the work he's done. Check out his
   [[https://github.com/brunchboy][afterglow]] project to see a really cool project that uses colors to great
-  effect.
+  effect. Also many thanks to Sylvain Ageneau for the CLJS port.
