@@ -1,5 +1,5 @@
 (defproject com.evocomputing/colors
-  "1.0.6"
+  "1.0.7"
   :description "Utilities for color manipulations.
 This is mostly code ported from  the color module in SASS."
   :url "http://jolby.github.com/colors/"
@@ -13,7 +13,7 @@ This is mostly code ported from  the color module in SASS."
             :copyright "Eclipse Public License (EPL)"
             :web-src-dir "http://github.com/jolby/colors/blob/"
             :web-home "http://jolby.github.com/colors/"}
-  :plugins [[codox "0.8.12"]]
+  :plugins [[lein-codox "0.10.7"]]
   :codox {:src-dir-uri "https://github.com/jolby/colors/blob/master/"
           :src-linenum-anchor-prefix "L"
           :output-dir "target/doc"}
