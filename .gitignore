@@ -19,3 +19,5 @@ package-lock.json
 node_modules
 .shadow-cljs
 .cache
+.cpcache
+.rebel*
