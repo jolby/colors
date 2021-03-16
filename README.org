@@ -21,28 +21,28 @@
     http://sekhon.berkeley.edu/library/RColorBrewer/html/ColorBrewer.html
 * Install
 deps.clj deps.edn
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC clojure
   {:deps
     ...
     com.evocomputing/colors {:mvn/version "1.0.7"}
     ... other deps
   }
-#+END_EXAMPLE
+#+END_SRC
 
 Or deps.edn using a particular git commit SHA
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC clojure
   {:deps
     ...
     com.evocomputing/colors {:git/url "https://github.com/jolby/colors.git"
                              :sha "3f31b34e429bdde1d777776abea221a177f1a7a0"}
     ... other deps
   }
-#+END_EXAMPLE
+#+END_SRC
 lein project.clj
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC clojure
   :dependencies [[com.evocomputing/colors "1.0.7"]
                  ...other deps ]]
-#+END_EXAMPLE
+#+END_SRC
 
 * Example Usage
   
@@ -50,7 +50,8 @@ lein project.clj
    The first point of entry is to create a color object. This package
    takes a wide range of representations to be passed to the
    create-color multimethod
-#+BEGIN_EXAMPLE 
+
+#+BEGIN_SRC clojure
 (require '[com.evocomputing.colors :refer [create-color]])
 
 ;;Symbolic: Either a string or keyword or symbol that matches an entry
@@ -84,14 +85,14 @@ lein project.clj
 (create-color {:h 120.0 :s 100.0 :l 50.0})
 (create-color {:h 120.0 :s 100.0 :l 50.0 :a 128})
 
-#+END_EXAMPLE
+#+END_SRC
 
 ** Convert colors
    You can easily convert color objects into java.awt.Color objects,
 or a packed 32 bit integer representation, or its component R, G, B,
 A or H, S, L, A parts.
 
-#+BEGIN_EXAMPLE 
+#+BEGIN_SRC clojure
 (require '[com.evocomputing.colors :as c])
 
 (def red-color (c/create-color :red))
@@ -109,11 +110,11 @@ A or H, S, L, A parts.
 
 ;;likewise for the HSL constituent components
 (:hsl red-color)
-#+END_EXAMPLE
+#+END_SRC
 
 ** Manipulate colors
    You can easily manipulate and adjust colors with simple operations
-#+BEGIN_EXAMPLE 
+#+BEGIN_SRC clojure
 (require '[com.evocomputing.colors :as c])
 
 (def blue-color (c/create-color :blue))
@@ -132,7 +133,7 @@ A or H, S, L, A parts.
 (c/darken blue-color 20)
 ;; => "#<color: 0xff000099 R: 0, G: 0, B: 153, H: 240.00, S: 100.00,#L: 30.00, A: 255>"
 
-#+END_EXAMPLE
+#+END_SRC
 
 ** Color Palettes
    You can use the com.evocomputing.colors.palettes package to easily
@@ -141,7 +142,7 @@ A or H, S, L, A parts.
    colorspaces package.
    http://cran.r-project.org/web/packages/colorspace/index.html
 
-#+BEGIN_EXAMPLE 
+#+BEGIN_SRC clojure
 (require '[com.evocomputing.colors.palettes.core
     :refer [rainbow-hsl diverge-hsl heat-hsl]])
 (require '[com.evocomputing.colors.palettes.color-brewer :as cb])
@@ -165,7 +166,7 @@ A or H, S, L, A parts.
 ;;Create an 8 item ColorBrewer sequential palette "YlOrRd" (Yellow,
 ;;Orange, Red)
 (cb/get-color-brewer-palette "YlOrRd" 8)
-#+END_EXAMPLE
+#+END_SRC
 
 * Documentation
   
