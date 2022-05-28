@@ -34,6 +34,7 @@ http://cran.r-project.org/web/packages/colorspace/index.html
 
     com.evocomputing.colors
   #?(:clj (:import (java.awt Color)))
+  (:refer-clojure :exclude [abs])
   (:require [com.evocomputing.colors.palettes.webcolors :as wc]
             [com.evocomputing.utils :as utils]
             [com.evocomputing.macros :refer [def-color-bin-op create-color-with-meta]]
